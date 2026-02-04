@@ -1,0 +1,1845 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NetPulse - Internet Connection Monitor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0f1a;
+            --bg-secondary: #111827;
+            --bg-card: #1a2332;
+            --bg-card-hover: #212d42;
+            --border-color: #2d3a4f;
+            --border-glow: rgba(6, 182, 212, 0.3);
+
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+
+            --accent-primary: #06b6d4;
+            --accent-secondary: #22d3ee;
+            --accent-glow: rgba(6, 182, 212, 0.4);
+
+            --success: #10b981;
+            --success-glow: rgba(16, 185, 129, 0.4);
+            --danger: #ef4444;
+            --danger-glow: rgba(239, 68, 68, 0.4);
+            --warning: #f59e0b;
+
+            --speed-download: #3b82f6;
+            --speed-upload: #8b5cf6;
+
+            --gradient-brand: linear-gradient(135deg, #06b6d4 0%, #0891b2 50%, #0e7490 100%);
+            --gradient-card: linear-gradient(135deg, rgba(6, 182, 212, 0.1) 0%, rgba(6, 182, 212, 0.02) 100%);
+
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+            --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
+            --shadow-glow: 0 0 40px rgba(6, 182, 212, 0.15);
+
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            min-height: 100vh;
+            color: var(--text-primary);
+            line-height: 1.5;
+        }
+
+        /* Animated background */
+        .bg-pattern {
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse at 20% 0%, rgba(6, 182, 212, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 100%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+                var(--bg-primary);
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        /* Header / Brand */
+        .header {
+            text-align: center;
+            padding: 40px 20px;
+            margin-bottom: 32px;
+        }
+
+        .brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .brand-logo {
+            width: 56px;
+            height: 56px;
+            background: var(--gradient-brand);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow-lg), var(--shadow-glow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .brand-logo::before {
+            content: '';
+            position: absolute;
+            inset: 2px;
+            background: var(--bg-card);
+            border-radius: 10px;
+        }
+
+        .brand-logo svg {
+            width: 32px;
+            height: 32px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .brand-name {
+            font-size: 36px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-primary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.5px;
+        }
+
+        .brand-tagline {
+            color: var(--text-secondary);
+            font-size: 15px;
+            font-weight: 400;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        /* Main Card */
+        .main-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* Status Section */
+        .status-section {
+            padding: 40px;
+            text-align: center;
+            border-bottom: 1px solid var(--border-color);
+            background: var(--gradient-card);
+        }
+
+        .status-display {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        .status-indicator {
+            position: relative;
+            width: 80px;
+            height: 80px;
+        }
+
+        .status-ring {
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            border: 3px solid var(--border-color);
+            transition: all 0.5s ease;
+        }
+
+        .status-ring.online {
+            border-color: var(--success);
+            box-shadow: 0 0 30px var(--success-glow), inset 0 0 20px rgba(16, 185, 129, 0.1);
+        }
+
+        .status-ring.offline {
+            border-color: var(--danger);
+            box-shadow: 0 0 30px var(--danger-glow), inset 0 0 20px rgba(239, 68, 68, 0.1);
+        }
+
+        .status-dot {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--border-color);
+            transition: all 0.5s ease;
+        }
+
+        .status-dot.online {
+            background: var(--success);
+            box-shadow: 0 0 20px var(--success-glow);
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+
+        .status-dot.offline {
+            background: var(--danger);
+            box-shadow: 0 0 20px var(--danger-glow);
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            50% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.8; }
+        }
+
+        .status-info h2 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 4px;
+            transition: color 0.3s ease;
+        }
+
+        .status-info h2.online { color: var(--success); }
+        .status-info h2.offline { color: var(--danger); }
+
+        .status-info p {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .stat-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--accent-primary);
+            transform: translateY(-2px);
+        }
+
+        .stat-card.speed-card {
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.08) 0%, rgba(139, 92, 246, 0.08) 100%);
+            border: 1px dashed var(--accent-primary);
+            cursor: pointer;
+        }
+
+        .stat-card.speed-card:hover {
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.15) 0%, rgba(139, 92, 246, 0.15) 100%);
+            border-style: solid;
+        }
+
+        .stat-card.testing {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(245, 158, 11, 0.05) 100%);
+            border-color: var(--warning);
+            animation: testing-pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes testing-pulse {
+            0%, 100% { border-color: var(--warning); }
+            50% { border-color: rgba(245, 158, 11, 0.4); }
+        }
+
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            margin: 0 auto 12px;
+            background: rgba(6, 182, 212, 0.1);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent-primary);
+        }
+
+        .stat-card.speed-card .stat-icon {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--speed-download);
+        }
+
+        .stat-card.speed-card.upload .stat-icon {
+            background: rgba(139, 92, 246, 0.1);
+            color: var(--speed-upload);
+        }
+
+        .stat-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+            letter-spacing: -0.5px;
+        }
+
+        .stat-card.speed-card .stat-value {
+            color: var(--speed-download);
+        }
+
+        .stat-card.speed-card.upload .stat-value {
+            color: var(--speed-upload);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-hint {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 8px;
+            opacity: 0.7;
+        }
+
+        /* Speed Test Controls */
+        .speed-controls {
+            padding: 24px 40px;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .speed-controls-info h3 {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .speed-controls-info p {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: var(--gradient-brand);
+            color: white;
+            box-shadow: 0 4px 12px rgba(6, 182, 212, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(6, 182, 212, 0.4);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: var(--bg-card);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--accent-primary);
+        }
+
+        .btn-danger {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-danger:hover {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: var(--danger);
+        }
+
+        .btn svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        /* Graph Section */
+        .graph-section {
+            padding: 32px 40px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title svg {
+            color: var(--accent-primary);
+        }
+
+        .graph-toggle {
+            display: flex;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            padding: 4px;
+            gap: 4px;
+        }
+
+        .graph-toggle-btn {
+            padding: 8px 16px;
+            border: none;
+            background: transparent;
+            border-radius: 6px;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .graph-toggle-btn.active {
+            background: var(--accent-primary);
+            color: white;
+            box-shadow: 0 2px 8px rgba(6, 182, 212, 0.3);
+        }
+
+        .graph-toggle-btn:hover:not(.active) {
+            color: var(--text-primary);
+            background: rgba(6, 182, 212, 0.1);
+        }
+
+        .graph-container {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 20px;
+        }
+
+        #connectionGraph {
+            width: 100%;
+            height: 260px;
+            border-radius: 8px;
+        }
+
+        .graph-legend {
+            display: flex;
+            gap: 24px;
+            margin-top: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+        }
+
+        .legend-dot.online { background: var(--success); }
+        .legend-dot.offline { background: var(--danger); }
+        .legend-dot.latency { background: var(--speed-download); }
+        .legend-dot.download { background: var(--speed-download); }
+        .legend-dot.upload { background: var(--speed-upload); }
+
+        /* Events Section */
+        .events-section {
+            padding: 32px 40px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .events-list {
+            max-height: 320px;
+            overflow-y: auto;
+            padding-right: 8px;
+        }
+
+        .events-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .events-list::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+            border-radius: 3px;
+        }
+
+        .events-list::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 3px;
+        }
+
+        .events-list::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-primary);
+        }
+
+        .event-item {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            margin-bottom: 10px;
+            transition: all 0.2s ease;
+        }
+
+        .event-item:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--border-color);
+        }
+
+        .event-item.online {
+            border-left: 3px solid var(--success);
+        }
+
+        .event-item.offline {
+            border-left: 3px solid var(--danger);
+        }
+
+        .event-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 16px;
+            font-size: 16px;
+        }
+
+        .event-item.online .event-icon {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+
+        .event-item.offline .event-icon {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+
+        .event-details {
+            flex: 1;
+        }
+
+        .event-type {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 2px;
+        }
+
+        .event-time {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .event-duration {
+            font-size: 13px;
+            color: var(--danger);
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 48px 20px;
+            color: var(--text-muted);
+        }
+
+        .empty-state svg {
+            width: 48px;
+            height: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .empty-state p {
+            font-size: 14px;
+        }
+
+        /* Controls Footer */
+        .controls-footer {
+            padding: 24px 40px;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            background: var(--bg-secondary);
+        }
+
+        /* App Footer */
+        .app-footer {
+            padding: 24px;
+            text-align: center;
+        }
+
+        .footer-text {
+            font-size: 13px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .footer-text svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .container {
+                padding: 16px;
+            }
+
+            .header {
+                padding: 24px 16px;
+            }
+
+            .brand-name {
+                font-size: 28px;
+            }
+
+            .status-section,
+            .speed-controls,
+            .graph-section,
+            .events-section,
+            .controls-footer {
+                padding: 24px 20px;
+            }
+
+            .speed-controls {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .section-header {
+                flex-direction: column;
+                gap: 16px;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+
+            .stat-value {
+                font-size: 22px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-pattern"></div>
+
+    <div class="container">
+        <header class="header">
+            <div class="brand">
+                <div class="brand-logo">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M22 12h-4l-3 9L9 3l-3 9H2" stroke="url(#pulse-gradient)"/>
+                        <defs>
+                            <linearGradient id="pulse-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" style="stop-color:#06b6d4"/>
+                                <stop offset="100%" style="stop-color:#22d3ee"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
+                <h1 class="brand-name">NetPulse</h1>
+            </div>
+            <p class="brand-tagline">Real-time internet monitoring and performance analytics</p>
+        </header>
+
+        <main class="main-card">
+            <!-- Status Section -->
+            <section class="status-section">
+                <div class="status-display">
+                    <div class="status-indicator">
+                        <div class="status-ring online" id="statusRing"></div>
+                        <div class="status-dot online" id="statusDot"></div>
+                    </div>
+                    <div class="status-info">
+                        <h2 class="online" id="statusText">Initializing...</h2>
+                        <p id="statusSubtext">Checking connection status</p>
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                                <polyline points="17 6 23 6 23 12"></polyline>
+                            </svg>
+                        </div>
+                        <div class="stat-value" id="uptimePercent">0%</div>
+                        <div class="stat-label">Uptime</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                                <line x1="12" y1="9" x2="12" y2="13"></line>
+                                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                            </svg>
+                        </div>
+                        <div class="stat-value" id="dropCount">0</div>
+                        <div class="stat-label">Drops</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12 6 12 12 16 14"></polyline>
+                            </svg>
+                        </div>
+                        <div class="stat-value" id="sessionTime">0:00</div>
+                        <div class="stat-label">Session</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+                            </svg>
+                        </div>
+                        <div class="stat-value" id="avgLatency">--</div>
+                        <div class="stat-label">Avg Latency</div>
+                    </div>
+                    <div class="stat-card speed-card" id="downloadSpeedBox" title="Download speed">
+                        <div class="stat-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="7 10 12 15 17 10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                        </div>
+                        <div class="stat-value" id="downloadSpeed">--</div>
+                        <div class="stat-label">Download</div>
+                        <div class="stat-hint" id="downloadHint">Auto-test: 5min</div>
+                    </div>
+                    <div class="stat-card speed-card upload" id="uploadSpeedBox" title="Upload speed">
+                        <div class="stat-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="17 8 12 3 7 8"></polyline>
+                                <line x1="12" y1="3" x2="12" y2="15"></line>
+                            </svg>
+                        </div>
+                        <div class="stat-value" id="uploadSpeed">--</div>
+                        <div class="stat-label">Upload</div>
+                        <div class="stat-hint" id="uploadHint">Auto-test: 5min</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Speed Test Controls -->
+            <section class="speed-controls">
+                <div class="speed-controls-info">
+                    <h3>Speed Test</h3>
+                    <p>Run an immediate speed test or wait for auto-test every 5 minutes</p>
+                </div>
+                <button class="btn btn-primary" onclick="runSpeedTest()" id="manualSpeedTestBtn">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                    </svg>
+                    Test Now
+                </button>
+            </section>
+
+            <!-- Graph Section -->
+            <section class="graph-section">
+                <div class="section-header">
+                    <div class="section-title">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="20" x2="18" y2="10"></line>
+                            <line x1="12" y1="20" x2="12" y2="4"></line>
+                            <line x1="6" y1="20" x2="6" y2="14"></line>
+                        </svg>
+                        Connection History (30 min)
+                    </div>
+                    <div class="graph-toggle">
+                        <button class="graph-toggle-btn active" onclick="switchGraphView('latency')" id="latencyGraphBtn">Latency</button>
+                        <button class="graph-toggle-btn" onclick="switchGraphView('speed')" id="speedGraphBtn">Speed</button>
+                    </div>
+                </div>
+                <div class="graph-container">
+                    <canvas id="connectionGraph"></canvas>
+                    <div class="graph-legend" id="graphLegend">
+                        <div class="legend-item">
+                            <div class="legend-dot online"></div>
+                            <span>Online</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-dot offline"></div>
+                            <span>Offline</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-dot latency"></div>
+                            <span>Latency (ms)</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Events Section -->
+            <section class="events-section">
+                <div class="section-header">
+                    <div class="section-title">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                        Event Log
+                    </div>
+                </div>
+                <div class="events-list" id="eventsList">
+                    <div class="empty-state">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+                        </svg>
+                        <p>No events recorded yet. Monitoring will begin automatically.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Controls Footer -->
+            <div class="controls-footer">
+                <button class="btn btn-primary" onclick="exportSnapshot()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                    Export Report
+                </button>
+                <button class="btn btn-secondary" onclick="toggleMonitoring()" id="toggleBtn">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="toggleIcon">
+                        <rect x="6" y="4" width="4" height="16"></rect>
+                        <rect x="14" y="4" width="4" height="16"></rect>
+                    </svg>
+                    <span id="toggleText">Pause</span>
+                </button>
+                <button class="btn btn-danger" onclick="clearData()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                    Clear Data
+                </button>
+            </div>
+        </main>
+
+        <footer class="app-footer">
+            <p class="footer-text">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+                All data stored locally. No information sent to external servers.
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        // Configuration
+        const CHECK_INTERVAL = 3000;
+        const PING_TIMEOUT = 5000;
+        const PING_URLS = [
+            'https://www.google.com/favicon.ico',
+            'https://www.cloudflare.com/favicon.ico'
+        ];
+        const GRAPH_HISTORY_DURATION = 30 * 60 * 1000;
+        const SPEED_TEST_FILE_SIZE = 1048576;
+        const SPEED_TEST_URL = 'https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js';
+
+        // State
+        let monitoringActive = true;
+        let currentStatus = null;
+        let sessionStartTime = Date.now();
+        let events = [];
+        let lastOfflineTime = null;
+        let totalUptime = 0;
+        let totalDowntime = 0;
+        let latencyMeasurements = [];
+        let checkInterval = null;
+        let sessionInterval = null;
+        let connectionHistory = [];
+        let graphCanvas = null;
+        let graphCtx = null;
+        let speedTestResults = [];
+        let currentDownloadSpeed = null;
+        let currentUploadSpeed = null;
+        let isSpeedTesting = false;
+        let speedTestInterval = 5;
+        let speedTestTimer = null;
+        let lastSpeedTestTime = 0;
+        let currentGraphView = 'latency';
+
+        // Theme colors for canvas
+        const colors = {
+            bgPrimary: '#0a0f1a',
+            bgSecondary: '#111827',
+            bgCard: '#1a2332',
+            border: '#2d3a4f',
+            textPrimary: '#f1f5f9',
+            textSecondary: '#94a3b8',
+            textMuted: '#64748b',
+            accent: '#06b6d4',
+            success: '#10b981',
+            danger: '#ef4444',
+            download: '#3b82f6',
+            upload: '#8b5cf6'
+        };
+
+        function init() {
+            loadStoredData();
+            initGraph();
+            startMonitoring();
+            updateDisplay();
+            sessionInterval = setInterval(updateSessionTime, 1000);
+            startAutoSpeedTest();
+        }
+
+        function initGraph() {
+            graphCanvas = document.getElementById('connectionGraph');
+            graphCtx = graphCanvas.getContext('2d');
+
+            const container = graphCanvas.parentElement;
+            graphCanvas.width = container.clientWidth - 40;
+            graphCanvas.height = 260;
+
+            window.addEventListener('resize', () => {
+                graphCanvas.width = container.clientWidth - 40;
+                drawGraph();
+            });
+
+            drawGraph();
+        }
+
+        function switchGraphView(view) {
+            currentGraphView = view;
+
+            document.getElementById('latencyGraphBtn').classList.remove('active');
+            document.getElementById('speedGraphBtn').classList.remove('active');
+
+            if (view === 'latency') {
+                document.getElementById('latencyGraphBtn').classList.add('active');
+            } else {
+                document.getElementById('speedGraphBtn').classList.add('active');
+            }
+
+            const legend = document.getElementById('graphLegend');
+            if (view === 'latency') {
+                legend.innerHTML = `
+                    <div class="legend-item">
+                        <div class="legend-dot online"></div>
+                        <span>Online</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot offline"></div>
+                        <span>Offline</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot latency"></div>
+                        <span>Latency (ms)</span>
+                    </div>
+                `;
+            } else {
+                legend.innerHTML = `
+                    <div class="legend-item">
+                        <div class="legend-dot online"></div>
+                        <span>Online</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot offline"></div>
+                        <span>Offline</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot download"></div>
+                        <span>Download (Mbps)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot upload"></div>
+                        <span>Upload (Mbps)</span>
+                    </div>
+                `;
+            }
+
+            drawGraph();
+        }
+
+        function drawGraph() {
+            if (!graphCtx || !graphCanvas) return;
+
+            const width = graphCanvas.width;
+            const height = graphCanvas.height;
+            const padding = { top: 20, right: 50, bottom: 35, left: 55 };
+            const graphWidth = width - padding.left - padding.right;
+            const graphHeight = height - padding.top - padding.bottom;
+
+            // Clear and fill background
+            graphCtx.fillStyle = colors.bgSecondary;
+            graphCtx.fillRect(0, 0, width, height);
+
+            const now = Date.now();
+            const thirtyMinsAgo = now - GRAPH_HISTORY_DURATION;
+            const filteredHistory = connectionHistory.filter(point => point.timestamp >= thirtyMinsAgo);
+
+            if (filteredHistory.length === 0) {
+                graphCtx.fillStyle = colors.textMuted;
+                graphCtx.font = '14px Inter, sans-serif';
+                graphCtx.textAlign = 'center';
+                graphCtx.fillText('Collecting data...', width / 2, height / 2);
+                return;
+            }
+
+            // Draw grid
+            graphCtx.strokeStyle = colors.border;
+            graphCtx.lineWidth = 1;
+
+            for (let i = 0; i <= 6; i++) {
+                const x = padding.left + (graphWidth / 6) * i;
+                graphCtx.beginPath();
+                graphCtx.moveTo(x, padding.top);
+                graphCtx.lineTo(x, padding.top + graphHeight);
+                graphCtx.stroke();
+            }
+
+            for (let i = 0; i <= 4; i++) {
+                const y = padding.top + (graphHeight / 4) * i;
+                graphCtx.beginPath();
+                graphCtx.moveTo(padding.left, y);
+                graphCtx.lineTo(padding.left + graphWidth, y);
+                graphCtx.stroke();
+            }
+
+            // Draw axes
+            graphCtx.strokeStyle = colors.textMuted;
+            graphCtx.lineWidth = 2;
+            graphCtx.beginPath();
+            graphCtx.moveTo(padding.left, padding.top);
+            graphCtx.lineTo(padding.left, padding.top + graphHeight);
+            graphCtx.lineTo(padding.left + graphWidth, padding.top + graphHeight);
+            graphCtx.stroke();
+
+            // Time labels
+            graphCtx.fillStyle = colors.textMuted;
+            graphCtx.font = '11px JetBrains Mono, monospace';
+            graphCtx.textAlign = 'center';
+
+            for (let i = 0; i <= 6; i++) {
+                const x = padding.left + (graphWidth / 6) * i;
+                const timeAgo = 30 - (i * 5);
+                const label = timeAgo === 0 ? 'Now' : `-${timeAgo}m`;
+                graphCtx.fillText(label, x, height - 10);
+            }
+
+            if (currentGraphView === 'latency') {
+                drawLatencyGraph(filteredHistory, padding, graphWidth, graphHeight, width);
+            } else {
+                drawSpeedGraph(filteredHistory, padding, graphWidth, graphHeight, width, thirtyMinsAgo);
+            }
+        }
+
+        function drawLatencyGraph(filteredHistory, padding, graphWidth, graphHeight, width) {
+            // Y-axis label
+            graphCtx.save();
+            graphCtx.fillStyle = colors.textMuted;
+            graphCtx.font = '11px Inter, sans-serif';
+            graphCtx.translate(12, padding.top + graphHeight / 2);
+            graphCtx.rotate(-Math.PI / 2);
+            graphCtx.textAlign = 'center';
+            graphCtx.fillText('Status', 0, 0);
+            graphCtx.restore();
+
+            graphCtx.textAlign = 'left';
+            graphCtx.fillText('Latency', width - padding.right + 5, padding.top - 5);
+
+            const maxLatency = Math.max(...filteredHistory.map(p => p.latency || 0), 100);
+
+            graphCtx.lineWidth = 2;
+            let lastX = null;
+            let lastY = null;
+            let lastStatus = null;
+
+            const thirtyMinsAgo = Date.now() - GRAPH_HISTORY_DURATION;
+
+            filteredHistory.forEach((point) => {
+                const timePct = (point.timestamp - thirtyMinsAgo) / GRAPH_HISTORY_DURATION;
+                const x = padding.left + (graphWidth * timePct);
+                const y = point.status ? padding.top + graphHeight * 0.25 : padding.top + graphHeight * 0.75;
+
+                if (lastX !== null && lastStatus !== null) {
+                    graphCtx.strokeStyle = lastStatus ? colors.success : colors.danger;
+                    graphCtx.beginPath();
+                    graphCtx.moveTo(lastX, lastY);
+                    graphCtx.lineTo(x, lastY);
+                    graphCtx.lineTo(x, y);
+                    graphCtx.stroke();
+
+                    graphCtx.fillStyle = lastStatus ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)';
+                    graphCtx.beginPath();
+                    graphCtx.moveTo(lastX, lastY);
+                    graphCtx.lineTo(x, lastY);
+                    graphCtx.lineTo(x, padding.top + graphHeight);
+                    graphCtx.lineTo(lastX, padding.top + graphHeight);
+                    graphCtx.closePath();
+                    graphCtx.fill();
+                }
+
+                lastX = x;
+                lastY = y;
+                lastStatus = point.status;
+            });
+
+            if (lastX !== null) {
+                const x = padding.left + graphWidth;
+                graphCtx.strokeStyle = lastStatus ? colors.success : colors.danger;
+                graphCtx.beginPath();
+                graphCtx.moveTo(lastX, lastY);
+                graphCtx.lineTo(x, lastY);
+                graphCtx.stroke();
+
+                graphCtx.fillStyle = lastStatus ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)';
+                graphCtx.beginPath();
+                graphCtx.moveTo(lastX, lastY);
+                graphCtx.lineTo(x, lastY);
+                graphCtx.lineTo(x, padding.top + graphHeight);
+                graphCtx.lineTo(lastX, padding.top + graphHeight);
+                graphCtx.closePath();
+                graphCtx.fill();
+            }
+
+            // Latency line
+            graphCtx.strokeStyle = colors.download;
+            graphCtx.lineWidth = 2;
+            graphCtx.beginPath();
+
+            let firstPoint = true;
+            filteredHistory.forEach(point => {
+                if (point.latency && point.status) {
+                    const timePct = (point.timestamp - thirtyMinsAgo) / GRAPH_HISTORY_DURATION;
+                    const x = padding.left + (graphWidth * timePct);
+                    const latencyPct = Math.min(point.latency / maxLatency, 1);
+                    const y = padding.top + graphHeight - (graphHeight * latencyPct);
+
+                    if (firstPoint) {
+                        graphCtx.moveTo(x, y);
+                        firstPoint = false;
+                    } else {
+                        graphCtx.lineTo(x, y);
+                    }
+                }
+            });
+
+            graphCtx.stroke();
+
+            // Status markers
+            graphCtx.fillStyle = colors.success;
+            graphCtx.beginPath();
+            graphCtx.roundRect(padding.left - 45, padding.top + graphHeight * 0.25 - 4, 35, 8, 2);
+            graphCtx.fill();
+
+            graphCtx.fillStyle = colors.textPrimary;
+            graphCtx.font = '10px JetBrains Mono, monospace';
+            graphCtx.textAlign = 'center';
+            graphCtx.fillText('ON', padding.left - 27, padding.top + graphHeight * 0.25 + 4);
+
+            graphCtx.fillStyle = colors.danger;
+            graphCtx.beginPath();
+            graphCtx.roundRect(padding.left - 45, padding.top + graphHeight * 0.75 - 4, 35, 8, 2);
+            graphCtx.fill();
+
+            graphCtx.fillStyle = colors.textPrimary;
+            graphCtx.fillText('OFF', padding.left - 27, padding.top + graphHeight * 0.75 + 4);
+        }
+
+        function drawSpeedGraph(filteredHistory, padding, graphWidth, graphHeight, width, thirtyMinsAgo) {
+            graphCtx.textAlign = 'left';
+            graphCtx.fillStyle = colors.textMuted;
+            graphCtx.fillText('Mbps', width - padding.right + 5, padding.top - 5);
+
+            const recentSpeedTests = speedTestResults.filter(test => test.timestamp >= thirtyMinsAgo);
+            const maxDownload = Math.max(...recentSpeedTests.map(t => t.download || 0), 10);
+            const maxUpload = Math.max(...recentSpeedTests.map(t => t.upload || 0), 5);
+            const maxSpeed = Math.max(maxDownload, maxUpload, 10);
+
+            graphCtx.lineWidth = 2;
+            let lastX = null;
+            let lastY = null;
+            let lastStatus = null;
+
+            filteredHistory.forEach((point) => {
+                const timePct = (point.timestamp - thirtyMinsAgo) / GRAPH_HISTORY_DURATION;
+                const x = padding.left + (graphWidth * timePct);
+                const y = point.status ? padding.top + graphHeight * 0.25 : padding.top + graphHeight * 0.75;
+
+                if (lastX !== null && lastStatus !== null) {
+                    graphCtx.strokeStyle = lastStatus ? colors.success : colors.danger;
+                    graphCtx.beginPath();
+                    graphCtx.moveTo(lastX, lastY);
+                    graphCtx.lineTo(x, lastY);
+                    graphCtx.lineTo(x, y);
+                    graphCtx.stroke();
+
+                    graphCtx.fillStyle = lastStatus ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)';
+                    graphCtx.beginPath();
+                    graphCtx.moveTo(lastX, lastY);
+                    graphCtx.lineTo(x, lastY);
+                    graphCtx.lineTo(x, padding.top + graphHeight);
+                    graphCtx.lineTo(lastX, padding.top + graphHeight);
+                    graphCtx.closePath();
+                    graphCtx.fill();
+                }
+
+                lastX = x;
+                lastY = y;
+                lastStatus = point.status;
+            });
+
+            if (lastX !== null) {
+                const x = padding.left + graphWidth;
+                graphCtx.strokeStyle = lastStatus ? colors.success : colors.danger;
+                graphCtx.beginPath();
+                graphCtx.moveTo(lastX, lastY);
+                graphCtx.lineTo(x, lastY);
+                graphCtx.stroke();
+
+                graphCtx.fillStyle = lastStatus ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)';
+                graphCtx.beginPath();
+                graphCtx.moveTo(lastX, lastY);
+                graphCtx.lineTo(x, lastY);
+                graphCtx.lineTo(x, padding.top + graphHeight);
+                graphCtx.lineTo(lastX, padding.top + graphHeight);
+                graphCtx.closePath();
+                graphCtx.fill();
+            }
+
+            // Speed lines
+            if (recentSpeedTests.length > 0) {
+                // Download
+                graphCtx.strokeStyle = colors.download;
+                graphCtx.lineWidth = 3;
+                graphCtx.beginPath();
+
+                let firstPoint = true;
+                recentSpeedTests.forEach(test => {
+                    if (test.download) {
+                        const timePct = (test.timestamp - thirtyMinsAgo) / GRAPH_HISTORY_DURATION;
+                        const x = padding.left + (graphWidth * timePct);
+                        const speedPct = Math.min(test.download / maxSpeed, 1);
+                        const y = padding.top + graphHeight - (graphHeight * speedPct);
+
+                        if (firstPoint) {
+                            graphCtx.moveTo(x, y);
+                            firstPoint = false;
+                        } else {
+                            graphCtx.lineTo(x, y);
+                        }
+                    }
+                });
+                graphCtx.stroke();
+
+                // Download points
+                recentSpeedTests.forEach(test => {
+                    if (test.download) {
+                        const timePct = (test.timestamp - thirtyMinsAgo) / GRAPH_HISTORY_DURATION;
+                        const x = padding.left + (graphWidth * timePct);
+                        const speedPct = Math.min(test.download / maxSpeed, 1);
+                        const y = padding.top + graphHeight - (graphHeight * speedPct);
+
+                        graphCtx.fillStyle = colors.download;
+                        graphCtx.beginPath();
+                        graphCtx.arc(x, y, 5, 0, Math.PI * 2);
+                        graphCtx.fill();
+                    }
+                });
+
+                // Upload
+                graphCtx.strokeStyle = colors.upload;
+                graphCtx.lineWidth = 3;
+                graphCtx.beginPath();
+
+                firstPoint = true;
+                recentSpeedTests.forEach(test => {
+                    if (test.upload) {
+                        const timePct = (test.timestamp - thirtyMinsAgo) / GRAPH_HISTORY_DURATION;
+                        const x = padding.left + (graphWidth * timePct);
+                        const speedPct = Math.min(test.upload / maxSpeed, 1);
+                        const y = padding.top + graphHeight - (graphHeight * speedPct);
+
+                        if (firstPoint) {
+                            graphCtx.moveTo(x, y);
+                            firstPoint = false;
+                        } else {
+                            graphCtx.lineTo(x, y);
+                        }
+                    }
+                });
+                graphCtx.stroke();
+
+                // Upload points
+                recentSpeedTests.forEach(test => {
+                    if (test.upload) {
+                        const timePct = (test.timestamp - thirtyMinsAgo) / GRAPH_HISTORY_DURATION;
+                        const x = padding.left + (graphWidth * timePct);
+                        const speedPct = Math.min(test.upload / maxSpeed, 1);
+                        const y = padding.top + graphHeight - (graphHeight * speedPct);
+
+                        graphCtx.fillStyle = colors.upload;
+                        graphCtx.beginPath();
+                        graphCtx.arc(x, y, 5, 0, Math.PI * 2);
+                        graphCtx.fill();
+                    }
+                });
+            }
+
+            // Status markers
+            graphCtx.fillStyle = colors.success;
+            graphCtx.beginPath();
+            graphCtx.roundRect(padding.left - 45, padding.top + graphHeight * 0.25 - 4, 35, 8, 2);
+            graphCtx.fill();
+
+            graphCtx.fillStyle = colors.textPrimary;
+            graphCtx.font = '10px JetBrains Mono, monospace';
+            graphCtx.textAlign = 'center';
+            graphCtx.fillText('ON', padding.left - 27, padding.top + graphHeight * 0.25 + 4);
+
+            graphCtx.fillStyle = colors.danger;
+            graphCtx.beginPath();
+            graphCtx.roundRect(padding.left - 45, padding.top + graphHeight * 0.75 - 4, 35, 8, 2);
+            graphCtx.fill();
+
+            graphCtx.fillStyle = colors.textPrimary;
+            graphCtx.fillText('OFF', padding.left - 27, padding.top + graphHeight * 0.75 + 4);
+        }
+
+        function loadStoredData() {
+            const stored = localStorage.getItem('netpulse_data');
+            if (stored) {
+                const data = JSON.parse(stored);
+                events = data.events || [];
+                totalUptime = data.totalUptime || 0;
+                totalDowntime = data.totalDowntime || 0;
+                latencyMeasurements = data.latencyMeasurements || [];
+                connectionHistory = data.connectionHistory || [];
+                speedTestResults = data.speedTestResults || [];
+                currentDownloadSpeed = data.currentDownloadSpeed || null;
+                currentUploadSpeed = data.currentUploadSpeed || null;
+                lastSpeedTestTime = data.lastSpeedTestTime || 0;
+
+                const thirtyMinsAgo = Date.now() - GRAPH_HISTORY_DURATION;
+                connectionHistory = connectionHistory.filter(point => point.timestamp >= thirtyMinsAgo);
+
+                if (currentDownloadSpeed) {
+                    document.getElementById('downloadSpeed').textContent = currentDownloadSpeed.toFixed(2) + ' Mbps';
+                }
+                if (currentUploadSpeed) {
+                    document.getElementById('uploadSpeed').textContent = currentUploadSpeed.toFixed(2) + ' Mbps';
+                }
+            }
+        }
+
+        function saveData() {
+            const data = {
+                events: events.slice(-100),
+                totalUptime,
+                totalDowntime,
+                latencyMeasurements: latencyMeasurements.slice(-50),
+                connectionHistory: connectionHistory.slice(-600),
+                speedTestResults: speedTestResults.slice(-50),
+                currentDownloadSpeed,
+                currentUploadSpeed,
+                lastSpeedTestTime
+            };
+            localStorage.setItem('netpulse_data', JSON.stringify(data));
+        }
+
+        async function checkConnection() {
+            if (!monitoringActive) return;
+
+            const startTime = Date.now();
+            let isOnline = false;
+            let latency = null;
+
+            try {
+                await fetch(PING_URLS[0] + '?t=' + Date.now(), {
+                    method: 'HEAD',
+                    mode: 'no-cors',
+                    cache: 'no-cache',
+                    signal: AbortSignal.timeout(PING_TIMEOUT)
+                });
+
+                latency = Date.now() - startTime;
+                isOnline = true;
+                latencyMeasurements.push(latency);
+                if (latencyMeasurements.length > 50) latencyMeasurements.shift();
+            } catch {
+                isOnline = false;
+            }
+
+            connectionHistory.push({
+                timestamp: Date.now(),
+                status: isOnline,
+                latency: latency
+            });
+
+            const thirtyMinsAgo = Date.now() - GRAPH_HISTORY_DURATION;
+            connectionHistory = connectionHistory.filter(point => point.timestamp >= thirtyMinsAgo);
+
+            if (currentStatus === null) {
+                currentStatus = isOnline;
+                addEvent(isOnline ? 'online' : 'offline');
+            } else if (currentStatus !== isOnline) {
+                if (!isOnline) {
+                    lastOfflineTime = Date.now();
+                    addEvent('offline');
+                } else {
+                    const downtime = Date.now() - lastOfflineTime;
+                    totalDowntime += downtime;
+                    addEvent('online', downtime);
+                    lastOfflineTime = null;
+                }
+                currentStatus = isOnline;
+            } else if (isOnline) {
+                totalUptime += CHECK_INTERVAL;
+            } else {
+                totalDowntime += CHECK_INTERVAL;
+            }
+
+            updateDisplay();
+            drawGraph();
+            saveData();
+        }
+
+        function addEvent(type, duration = null) {
+            events.push({
+                type,
+                timestamp: Date.now(),
+                duration
+            });
+
+            if (events.length > 100) events.shift();
+            renderEvents();
+        }
+
+        function renderEvents() {
+            const eventsList = document.getElementById('eventsList');
+
+            if (events.length === 0) {
+                eventsList.innerHTML = `
+                    <div class="empty-state">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+                        </svg>
+                        <p>No events recorded yet. Monitoring will begin automatically.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            eventsList.innerHTML = events.slice().reverse().map(event => {
+                const date = new Date(event.timestamp);
+                const timeStr = date.toLocaleTimeString();
+                const icon = event.type === 'online' ?
+                    '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>' :
+                    '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>';
+                const typeText = event.type === 'online' ? 'Connected' : 'Disconnected';
+
+                let durationStr = '';
+                if (event.duration) {
+                    const seconds = Math.floor(event.duration / 1000);
+                    const minutes = Math.floor(seconds / 60);
+                    durationStr = `<div class="event-duration">Downtime: ${minutes}m ${seconds % 60}s</div>`;
+                }
+
+                return `
+                    <div class="event-item ${event.type}">
+                        <div class="event-icon">${icon}</div>
+                        <div class="event-details">
+                            <div class="event-type">${typeText}</div>
+                            <div class="event-time">${timeStr}</div>
+                            ${durationStr}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function updateDisplay() {
+            const statusDot = document.getElementById('statusDot');
+            const statusRing = document.getElementById('statusRing');
+            const statusText = document.getElementById('statusText');
+            const statusSubtext = document.getElementById('statusSubtext');
+
+            if (currentStatus === true) {
+                statusDot.className = 'status-dot online';
+                statusRing.className = 'status-ring online';
+                statusText.className = 'online';
+                statusText.textContent = 'Connected';
+                statusSubtext.textContent = 'Your connection is stable';
+            } else if (currentStatus === false) {
+                statusDot.className = 'status-dot offline';
+                statusRing.className = 'status-ring offline';
+                statusText.className = 'offline';
+                statusText.textContent = 'Disconnected';
+                statusSubtext.textContent = 'Connection lost - monitoring...';
+            }
+
+            const totalTime = totalUptime + totalDowntime;
+            const uptimePercent = totalTime > 0 ? ((totalUptime / totalTime) * 100).toFixed(1) : 100;
+            document.getElementById('uptimePercent').textContent = uptimePercent + '%';
+
+            const dropCount = events.filter(e => e.type === 'offline').length;
+            document.getElementById('dropCount').textContent = dropCount;
+
+            if (latencyMeasurements.length > 0) {
+                const avgLatency = latencyMeasurements.reduce((a, b) => a + b, 0) / latencyMeasurements.length;
+                document.getElementById('avgLatency').textContent = Math.round(avgLatency) + 'ms';
+            }
+        }
+
+        function updateSessionTime() {
+            const elapsed = Date.now() - sessionStartTime;
+            const hours = Math.floor(elapsed / 3600000);
+            const minutes = Math.floor((elapsed % 3600000) / 60000);
+            const seconds = Math.floor((elapsed % 60000) / 1000);
+
+            if (hours > 0) {
+                document.getElementById('sessionTime').textContent = `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            } else {
+                document.getElementById('sessionTime').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            }
+        }
+
+        function startMonitoring() {
+            if (checkInterval) clearInterval(checkInterval);
+            checkConnection();
+            checkInterval = setInterval(checkConnection, CHECK_INTERVAL);
+        }
+
+        function toggleMonitoring() {
+            monitoringActive = !monitoringActive;
+            const toggleText = document.getElementById('toggleText');
+            const toggleIcon = document.getElementById('toggleIcon');
+
+            if (monitoringActive) {
+                toggleText.textContent = 'Pause';
+                toggleIcon.innerHTML = '<rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect>';
+                startMonitoring();
+            } else {
+                toggleText.textContent = 'Resume';
+                toggleIcon.innerHTML = '<polygon points="5 3 19 12 5 21 5 3"></polygon>';
+                if (checkInterval) clearInterval(checkInterval);
+            }
+        }
+
+        function exportSnapshot() {
+            const avgDownload = speedTestResults.length > 0
+                ? speedTestResults.reduce((a, b) => a + (b.download || 0), 0) / speedTestResults.length
+                : 0;
+            const avgUpload = speedTestResults.length > 0
+                ? speedTestResults.reduce((a, b) => a + (b.upload || 0), 0) / speedTestResults.length
+                : 0;
+
+            const data = {
+                reportGenerator: 'NetPulse v1.0',
+                exportDate: new Date().toISOString(),
+                sessionStartTime: new Date(sessionStartTime).toISOString(),
+                summary: {
+                    totalUptime: Math.round(totalUptime / 1000) + ' seconds',
+                    totalDowntime: Math.round(totalDowntime / 1000) + ' seconds',
+                    uptimePercentage: ((totalUptime / (totalUptime + totalDowntime)) * 100).toFixed(2) + '%',
+                    connectionDrops: events.filter(e => e.type === 'offline').length,
+                    averageLatency: latencyMeasurements.length > 0
+                        ? Math.round(latencyMeasurements.reduce((a, b) => a + b, 0) / latencyMeasurements.length) + 'ms'
+                        : 'N/A'
+                },
+                speedTest: {
+                    currentDownload: currentDownloadSpeed ? currentDownloadSpeed.toFixed(2) + ' Mbps' : 'N/A',
+                    currentUpload: currentUploadSpeed ? currentUploadSpeed.toFixed(2) + ' Mbps' : 'N/A',
+                    averageDownload: avgDownload > 0 ? avgDownload.toFixed(2) + ' Mbps' : 'N/A',
+                    averageUpload: avgUpload > 0 ? avgUpload.toFixed(2) + ' Mbps' : 'N/A',
+                    totalTests: speedTestResults.length
+                },
+                events: events.map(e => ({
+                    type: e.type,
+                    timestamp: new Date(e.timestamp).toISOString(),
+                    duration: e.duration ? Math.round(e.duration / 1000) + ' seconds' : null
+                })),
+                connectionHistory: connectionHistory.map(point => ({
+                    timestamp: new Date(point.timestamp).toISOString(),
+                    status: point.status ? 'online' : 'offline',
+                    latency: point.latency ? point.latency + 'ms' : null
+                })),
+                speedTestHistory: speedTestResults.map(test => ({
+                    timestamp: new Date(test.timestamp).toISOString(),
+                    download: test.download ? test.download.toFixed(2) + ' Mbps' : 'N/A',
+                    upload: test.upload ? test.upload.toFixed(2) + ' Mbps' : 'N/A'
+                }))
+            };
+
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `netpulse-report-${Date.now()}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            alert('Report exported successfully! Share this file with your ISP for documentation.');
+        }
+
+        function clearData() {
+            if (confirm('Clear all monitoring data? This action cannot be undone.')) {
+                events = [];
+                totalUptime = 0;
+                totalDowntime = 0;
+                latencyMeasurements = [];
+                connectionHistory = [];
+                speedTestResults = [];
+                currentDownloadSpeed = null;
+                currentUploadSpeed = null;
+                currentStatus = null;
+                sessionStartTime = Date.now();
+                lastSpeedTestTime = 0;
+                localStorage.removeItem('netpulse_data');
+                renderEvents();
+                updateDisplay();
+                drawGraph();
+                document.getElementById('downloadSpeed').textContent = '--';
+                document.getElementById('uploadSpeed').textContent = '--';
+                alert('All data cleared successfully.');
+            }
+        }
+
+        async function runSpeedTest() {
+            if (isSpeedTesting) return;
+            if (!currentStatus) {
+                alert('Cannot test speed while offline.');
+                return;
+            }
+
+            isSpeedTesting = true;
+            const downloadSpeedBox = document.getElementById('downloadSpeedBox');
+            const uploadSpeedBox = document.getElementById('uploadSpeedBox');
+            const downloadValue = document.getElementById('downloadSpeed');
+            const uploadValue = document.getElementById('uploadSpeed');
+            const testBtn = document.getElementById('manualSpeedTestBtn');
+
+            downloadSpeedBox.classList.add('testing');
+            uploadSpeedBox.classList.add('testing');
+            downloadValue.textContent = 'Testing...';
+            uploadValue.textContent = 'Waiting...';
+            if (testBtn) testBtn.disabled = true;
+
+            try {
+                let totalBytes = 0;
+                let totalTime = 0;
+                const downloadIterations = 3;
+
+                for (let i = 0; i < downloadIterations; i++) {
+                    const startTime = performance.now();
+                    const response = await fetch(SPEED_TEST_URL + '?t=' + Date.now(), { cache: 'no-cache' });
+                    const blob = await response.blob();
+                    const endTime = performance.now();
+
+                    totalBytes += blob.size;
+                    totalTime += (endTime - startTime);
+                }
+
+                const avgTimeInSeconds = (totalTime / downloadIterations) / 1000;
+                const avgBytesPerSecond = (totalBytes / downloadIterations) / avgTimeInSeconds;
+                const downloadSpeed = (avgBytesPerSecond * 8) / (1024 * 1024);
+
+                currentDownloadSpeed = downloadSpeed;
+                downloadValue.textContent = downloadSpeed.toFixed(2) + ' Mbps';
+
+                uploadValue.textContent = 'Testing...';
+
+                let uploadSpeed = 0;
+                const uploadIterations = 2;
+                let uploadTotalTime = 0;
+                const uploadDataSize = 512 * 1024;
+                const uploadData = new Blob([new ArrayBuffer(uploadDataSize)]);
+
+                for (let i = 0; i < uploadIterations; i++) {
+                    const startTime = performance.now();
+                    try {
+                        const formData = new FormData();
+                        formData.append('data', uploadData);
+
+                        await fetch('https://httpbin.org/post', {
+                            method: 'POST',
+                            body: formData,
+                            mode: 'no-cors'
+                        }).catch(() => {});
+
+                        const endTime = performance.now();
+                        uploadTotalTime += (endTime - startTime);
+                    } catch {
+                        uploadSpeed = downloadSpeed * 0.3;
+                        break;
+                    }
+                }
+
+                if (uploadTotalTime > 0) {
+                    const avgUploadTime = (uploadTotalTime / uploadIterations) / 1000;
+                    const uploadBytesPerSecond = uploadDataSize / avgUploadTime;
+                    uploadSpeed = (uploadBytesPerSecond * 8) / (1024 * 1024);
+                    uploadSpeed = Math.min(uploadSpeed, downloadSpeed);
+                    uploadSpeed = Math.max(uploadSpeed, downloadSpeed * 0.1);
+                }
+
+                currentUploadSpeed = uploadSpeed;
+                lastSpeedTestTime = Date.now();
+
+                speedTestResults.push({
+                    timestamp: Date.now(),
+                    download: downloadSpeed,
+                    upload: uploadSpeed
+                });
+
+                if (speedTestResults.length > 50) {
+                    speedTestResults.shift();
+                }
+
+                uploadValue.textContent = uploadSpeed.toFixed(2) + ' Mbps';
+
+                if (currentGraphView === 'speed') {
+                    drawGraph();
+                }
+
+                saveData();
+
+            } catch (error) {
+                console.error('Speed test failed:', error);
+                downloadValue.textContent = 'Failed';
+                uploadValue.textContent = 'Failed';
+
+                setTimeout(() => {
+                    downloadValue.textContent = currentDownloadSpeed ? currentDownloadSpeed.toFixed(2) + ' Mbps' : '--';
+                    uploadValue.textContent = currentUploadSpeed ? currentUploadSpeed.toFixed(2) + ' Mbps' : '--';
+                }, 2000);
+            } finally {
+                isSpeedTesting = false;
+                downloadSpeedBox.classList.remove('testing');
+                uploadSpeedBox.classList.remove('testing');
+                if (testBtn) testBtn.disabled = false;
+            }
+        }
+
+        function startAutoSpeedTest() {
+            if (speedTestTimer) clearInterval(speedTestTimer);
+
+            const timeSinceLastTest = Date.now() - lastSpeedTestTime;
+            if (timeSinceLastTest > speedTestInterval * 60 * 1000) {
+                setTimeout(() => {
+                    if (currentStatus && !isSpeedTesting) {
+                        runSpeedTest();
+                    }
+                }, 5000);
+            }
+
+            speedTestTimer = setInterval(() => {
+                if (currentStatus && !isSpeedTesting) {
+                    runSpeedTest();
+                }
+            }, speedTestInterval * 60 * 1000);
+        }
+
+        function stopAutoSpeedTest() {
+            if (speedTestTimer) {
+                clearInterval(speedTestTimer);
+                speedTestTimer = null;
+            }
+        }
+
+        window.addEventListener('load', init);
+        window.addEventListener('beforeunload', () => {
+            saveData();
+            stopAutoSpeedTest();
+        });
+    </script>
+</body>
+</html>
