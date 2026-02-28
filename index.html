@@ -48,6 +48,34 @@
             --radius-xl: 24px;
         }
 
+        @media (prefers-color-scheme: light) {
+            :root {
+                --bg-primary: #f8fafc;
+                --bg-secondary: #f1f5f9;
+                --bg-card: #e2e8f0;
+                --bg-card-hover: #cbd5e1;
+                --border-color: #cbd5e1;
+                --border-glow: rgba(6, 182, 212, 0.2);
+
+                --text-primary: #0f172a;
+                --text-secondary: #475569;
+                --text-muted: #78716c;
+
+                --accent-primary: #0891b2;
+                --accent-secondary: #06b6d4;
+                --accent-glow: rgba(6, 182, 212, 0.3);
+
+                --success: #059669;
+                --success-glow: rgba(5, 150, 105, 0.3);
+                --danger: #dc2626;
+                --danger-glow: rgba(220, 38, 38, 0.3);
+                --warning: #d97706;
+
+                --gradient-brand: linear-gradient(135deg, #0891b2 0%, #0e7490 50%, #0d9488 100%);
+                --gradient-card: linear-gradient(135deg, rgba(6, 182, 212, 0.08) 0%, rgba(6, 182, 212, 0.02) 100%);
+            }
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -81,9 +109,19 @@
 
         /* Header / Brand */
         .header {
-            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
             padding: 40px 20px;
             margin-bottom: 32px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .header-brand {
+            text-align: center;
+            flex: 1;
+            min-width: 300px;
         }
 
         .brand {
@@ -137,6 +175,34 @@
             font-weight: 400;
             max-width: 400px;
             margin: 0 auto;
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .theme-toggle {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            padding: 8px 12px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+        }
+
+        .theme-toggle:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
         }
 
         /* Main Card */
@@ -259,6 +325,11 @@
             transform: translateY(-2px);
         }
 
+        .stat-card:focus-visible {
+            outline: 2px solid var(--accent-primary);
+            outline-offset: 2px;
+        }
+
         .stat-card.speed-card {
             background: linear-gradient(135deg, rgba(6, 182, 212, 0.08) 0%, rgba(139, 92, 246, 0.08) 100%);
             border: 1px dashed var(--accent-primary);
@@ -373,6 +444,11 @@
             transition: all 0.2s ease;
         }
 
+        .btn:focus-visible {
+            outline: 2px solid var(--accent-primary);
+            outline-offset: 2px;
+        }
+
         .btn-primary {
             background: var(--gradient-brand);
             color: white;
@@ -465,6 +541,11 @@
             transition: all 0.2s ease;
         }
 
+        .graph-toggle-btn:focus-visible {
+            outline: 2px solid var(--accent-primary);
+            outline-offset: 2px;
+        }
+
         .graph-toggle-btn.active {
             background: var(--accent-primary);
             color: white;
@@ -481,12 +562,34 @@
             border: 1px solid var(--border-color);
             border-radius: var(--radius-md);
             padding: 20px;
+            position: relative;
         }
 
         #connectionGraph {
             width: 100%;
             height: 260px;
             border-radius: 8px;
+            display: block;
+        }
+
+        .graph-tooltip {
+            display: none;
+            position: absolute;
+            background: var(--bg-card);
+            border: 1px solid var(--accent-primary);
+            border-radius: var(--radius-sm);
+            padding: 12px;
+            font-size: 12px;
+            color: var(--text-primary);
+            font-family: 'JetBrains Mono', monospace;
+            z-index: 10;
+            box-shadow: var(--shadow-md);
+            white-space: nowrap;
+            pointer-events: none;
+        }
+
+        .graph-tooltip.active {
+            display: block;
         }
 
         .graph-legend {
@@ -580,6 +683,7 @@
             justify-content: center;
             margin-right: 16px;
             font-size: 16px;
+            flex-shrink: 0;
         }
 
         .event-item.online .event-icon {
@@ -641,6 +745,121 @@
             background: var(--bg-secondary);
         }
 
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            pointer-events: none;
+        }
+
+        .toast {
+            background: var(--bg-card);
+            border: 1px solid var(--accent-primary);
+            border-radius: var(--radius-md);
+            padding: 16px 20px;
+            color: var(--text-primary);
+            font-size: 14px;
+            box-shadow: var(--shadow-lg);
+            animation: slideIn 0.3s ease;
+            pointer-events: all;
+            max-width: 300px;
+        }
+
+        .toast.success {
+            border-color: var(--success);
+        }
+
+        .toast.error {
+            border-color: var(--danger);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
+
+        .toast.removing {
+            animation: slideOut 0.3s ease forwards;
+        }
+
+        /* Modal Overlay */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-dialog {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            max-width: 400px;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+        }
+
+        .modal-content {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        /* Status Live Region */
+        .sr-live {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border-width: 0;
+        }
+
         /* App Footer */
         .app-footer {
             padding: 24px;
@@ -669,6 +888,11 @@
 
             .header {
                 padding: 24px 16px;
+                flex-direction: column;
+            }
+
+            .header-brand {
+                min-width: 100%;
             }
 
             .brand-name {
@@ -701,6 +925,21 @@
             .stat-value {
                 font-size: 22px;
             }
+
+            .toast-container {
+                left: 12px;
+                right: 12px;
+                bottom: 12px;
+            }
+
+            .toast {
+                max-width: none;
+            }
+
+            .modal-dialog {
+                margin: 20px;
+                max-width: calc(100% - 40px);
+            }
         }
     </style>
 </head>
@@ -709,21 +948,26 @@
 
     <div class="container">
         <header class="header">
-            <div class="brand">
-                <div class="brand-logo">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M22 12h-4l-3 9L9 3l-3 9H2" stroke="url(#pulse-gradient)"/>
-                        <defs>
-                            <linearGradient id="pulse-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                                <stop offset="0%" style="stop-color:#06b6d4"/>
-                                <stop offset="100%" style="stop-color:#22d3ee"/>
-                            </linearGradient>
-                        </defs>
-                    </svg>
+            <div class="header-brand">
+                <div class="brand">
+                    <div class="brand-logo">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22 12h-4l-3 9L9 3l-3 9H2" stroke="url(#pulse-gradient)"/>
+                            <defs>
+                                <linearGradient id="pulse-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" style="stop-color:#06b6d4"/>
+                                    <stop offset="100%" style="stop-color:#22d3ee"/>
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                    </div>
+                    <h1 class="brand-name">NetPulse</h1>
                 </div>
-                <h1 class="brand-name">NetPulse</h1>
+                <p class="brand-tagline">Real-time internet monitoring and performance analytics</p>
             </div>
-            <p class="brand-tagline">Real-time internet monitoring and performance analytics</p>
+            <div class="header-controls">
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark/light mode" title="Toggle theme">🌙</button>
+            </div>
         </header>
 
         <main class="main-card">
@@ -731,17 +975,17 @@
             <section class="status-section">
                 <div class="status-display">
                     <div class="status-indicator">
-                        <div class="status-ring online" id="statusRing"></div>
-                        <div class="status-dot online" id="statusDot"></div>
+                        <div class="status-ring online" id="statusRing" aria-hidden="true"></div>
+                        <div class="status-dot online" id="statusDot" aria-hidden="true"></div>
                     </div>
                     <div class="status-info">
-                        <h2 class="online" id="statusText">Initializing...</h2>
+                        <h2 class="online" id="statusText" aria-live="polite">Initializing...</h2>
                         <p id="statusSubtext">Checking connection status</p>
                     </div>
                 </div>
 
                 <div class="stats-grid">
-                    <div class="stat-card">
+                    <div class="stat-card" tabindex="0" role="region" aria-label="Uptime percentage">
                         <div class="stat-icon">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
@@ -751,7 +995,7 @@
                         <div class="stat-value" id="uptimePercent">0%</div>
                         <div class="stat-label">Uptime</div>
                     </div>
-                    <div class="stat-card">
+                    <div class="stat-card" tabindex="0" role="region" aria-label="Connection drops">
                         <div class="stat-icon">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
@@ -762,7 +1006,7 @@
                         <div class="stat-value" id="dropCount">0</div>
                         <div class="stat-label">Drops</div>
                     </div>
-                    <div class="stat-card">
+                    <div class="stat-card" tabindex="0" role="region" aria-label="Session duration">
                         <div class="stat-icon">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <circle cx="12" cy="12" r="10"></circle>
@@ -772,7 +1016,7 @@
                         <div class="stat-value" id="sessionTime">0:00</div>
                         <div class="stat-label">Session</div>
                     </div>
-                    <div class="stat-card">
+                    <div class="stat-card" tabindex="0" role="region" aria-label="Average latency">
                         <div class="stat-icon">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
@@ -781,7 +1025,28 @@
                         <div class="stat-value" id="avgLatency">--</div>
                         <div class="stat-label">Avg Latency</div>
                     </div>
-                    <div class="stat-card speed-card" id="downloadSpeedBox" title="Download speed">
+                    <div class="stat-card" tabindex="0" role="region" aria-label="Minimum latency">
+                        <div class="stat-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+                            </svg>
+                        </div>
+                        <div class="stat-value" id="minLatency">--</div>
+                        <div class="stat-label">Min Latency</div>
+                    </div>
+                    <div class="stat-card" tabindex="0" role="region" aria-label="Maximum latency and jitter">
+                        <div class="stat-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+                            </svg>
+                        </div>
+                        <div class="stat-value" id="maxJitter">--</div>
+                        <div class="stat-label">Max/Jitter</div>
+                    </div>
+                </div>
+
+                <div class="stats-grid" style="margin-top: 16px;">
+                    <div class="stat-card speed-card" id="downloadSpeedBox" tabindex="0" role="region" aria-label="Download speed" title="Download speed">
                         <div class="stat-icon">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
@@ -793,7 +1058,7 @@
                         <div class="stat-label">Download</div>
                         <div class="stat-hint" id="downloadHint">Auto-test: 5min</div>
                     </div>
-                    <div class="stat-card speed-card upload" id="uploadSpeedBox" title="Upload speed">
+                    <div class="stat-card speed-card upload" id="uploadSpeedBox" tabindex="0" role="region" aria-label="Upload speed (estimated)" title="Upload speed">
                         <div class="stat-icon">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
@@ -803,7 +1068,7 @@
                         </div>
                         <div class="stat-value" id="uploadSpeed">--</div>
                         <div class="stat-label">Upload</div>
-                        <div class="stat-hint" id="uploadHint">Auto-test: 5min</div>
+                        <div class="stat-hint" id="uploadHint">Est. / Auto-test: 5min</div>
                     </div>
                 </div>
             </section>
@@ -814,7 +1079,7 @@
                     <h3>Speed Test</h3>
                     <p>Run an immediate speed test or wait for auto-test every 5 minutes</p>
                 </div>
-                <button class="btn btn-primary" onclick="runSpeedTest()" id="manualSpeedTestBtn">
+                <button class="btn btn-primary" onclick="window.netpulse.runSpeedTest()" id="manualSpeedTestBtn" aria-label="Run speed test now">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
                     </svg>
@@ -834,12 +1099,13 @@
                         Connection History (30 min)
                     </div>
                     <div class="graph-toggle">
-                        <button class="graph-toggle-btn active" onclick="switchGraphView('latency')" id="latencyGraphBtn">Latency</button>
-                        <button class="graph-toggle-btn" onclick="switchGraphView('speed')" id="speedGraphBtn">Speed</button>
+                        <button class="graph-toggle-btn active" onclick="window.netpulse.switchGraphView('latency')" id="latencyGraphBtn" aria-label="Show latency graph">Latency</button>
+                        <button class="graph-toggle-btn" onclick="window.netpulse.switchGraphView('speed')" id="speedGraphBtn" aria-label="Show speed graph">Speed</button>
                     </div>
                 </div>
                 <div class="graph-container">
-                    <canvas id="connectionGraph"></canvas>
+                    <canvas id="connectionGraph" role="img" aria-label="Connection history graph"></canvas>
+                    <div class="graph-tooltip" id="graphTooltip"></div>
                     <div class="graph-legend" id="graphLegend">
                         <div class="legend-item">
                             <div class="legend-dot online"></div>
@@ -871,7 +1137,7 @@
                         Event Log
                     </div>
                 </div>
-                <div class="events-list" id="eventsList">
+                <div class="events-list" id="eventsList" role="feed" aria-label="Event log">
                     <div class="empty-state">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
@@ -883,22 +1149,31 @@
 
             <!-- Controls Footer -->
             <div class="controls-footer">
-                <button class="btn btn-primary" onclick="exportSnapshot()">
+                <button class="btn btn-primary" onclick="window.netpulse.exportSnapshot()" aria-label="Export report as JSON">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                         <polyline points="17 8 12 3 7 8"></polyline>
                         <line x1="12" y1="3" x2="12" y2="15"></line>
                     </svg>
-                    Export Report
+                    Export JSON
                 </button>
-                <button class="btn btn-secondary" onclick="toggleMonitoring()" id="toggleBtn">
+                <button class="btn btn-secondary" onclick="window.netpulse.exportCSV()" aria-label="Export data as CSV">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="12" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="13" x2="16" y2="13"></line>
+                    </svg>
+                    Export CSV
+                </button>
+                <button class="btn btn-secondary" onclick="window.netpulse.toggleMonitoring()" id="toggleBtn" aria-label="Pause or resume monitoring">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="toggleIcon">
                         <rect x="6" y="4" width="4" height="16"></rect>
                         <rect x="14" y="4" width="4" height="16"></rect>
                     </svg>
                     <span id="toggleText">Pause</span>
                 </button>
-                <button class="btn btn-danger" onclick="clearData()">
+                <button class="btn btn-danger" onclick="window.netpulse.clearData()" aria-label="Clear all monitoring data">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <polyline points="3 6 5 6 21 6"></polyline>
                         <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
@@ -919,346 +1194,484 @@
         </footer>
     </div>
 
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer" role="region" aria-label="Notifications" aria-live="polite"></div>
+
+    <!-- Modal Dialog -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-dialog" role="alertdialog">
+            <div class="modal-title" id="modalTitle">Confirm</div>
+            <div class="modal-content" id="modalContent"></div>
+            <div class="modal-buttons">
+                <button class="btn btn-secondary" onclick="window.netpulse.cancelModal()" id="modalCancelBtn">Cancel</button>
+                <button class="btn btn-primary" onclick="window.netpulse.confirmModal()" id="modalConfirmBtn">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Status Live Region -->
+    <div class="sr-live" id="statusLiveRegion" role="status" aria-live="assertive" aria-atomic="true"></div>
+
     <script>
-        // Configuration
-        const CHECK_INTERVAL = 3000;
-        const PING_TIMEOUT = 5000;
-        const PING_URLS = [
-            'https://www.google.com/favicon.ico',
-            'https://www.cloudflare.com/favicon.ico'
-        ];
-        const GRAPH_HISTORY_DURATION = 30 * 60 * 1000;
-        const SPEED_TEST_FILE_SIZE = 1048576;
-        const SPEED_TEST_URL = 'https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js';
+        // NetPulse Module
+        (function() {
+            // Configuration
+            const CHECK_INTERVAL = 3000;
+            const PING_TIMEOUT = 5000;
+            const PING_URLS = [
+                'https://www.google.com/favicon.ico',
+                'https://www.cloudflare.com/favicon.ico'
+            ];
+            const GRAPH_HISTORY_DURATION = 30 * 60 * 1000;
+            const SPEED_TEST_FILE_SIZE = 1048576;
+            const SPEED_TEST_URL = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
 
-        // State
-        let monitoringActive = true;
-        let currentStatus = null;
-        let sessionStartTime = Date.now();
-        let events = [];
-        let lastOfflineTime = null;
-        let totalUptime = 0;
-        let totalDowntime = 0;
-        let latencyMeasurements = [];
-        let checkInterval = null;
-        let sessionInterval = null;
-        let connectionHistory = [];
-        let graphCanvas = null;
-        let graphCtx = null;
-        let speedTestResults = [];
-        let currentDownloadSpeed = null;
-        let currentUploadSpeed = null;
-        let isSpeedTesting = false;
-        let speedTestInterval = 5;
-        let speedTestTimer = null;
-        let lastSpeedTestTime = 0;
-        let currentGraphView = 'latency';
+            // State
+            let monitoringActive = true;
+            let currentStatus = null;
+            let sessionStartTime = Date.now();
+            let events = [];
+            let lastOfflineTime = null;
+            let totalUptime = 0;
+            let totalDowntime = 0;
+            let latencyMeasurements = [];
+            let checkInterval = null;
+            let sessionInterval = null;
+            let connectionHistory = [];
+            let graphCanvas = null;
+            let graphCtx = null;
+            let speedTestResults = [];
+            let currentDownloadSpeed = null;
+            let currentUploadSpeed = null;
+            let isSpeedTesting = false;
+            let speedTestInterval = 5;
+            let speedTestTimer = null;
+            let lastSpeedTestTime = 0;
+            let currentGraphView = 'latency';
+            let notificationPermission = false;
+            let modalCallback = null;
+            let graphTooltipData = null;
 
-        // Theme colors for canvas
-        const colors = {
-            bgPrimary: '#0a0f1a',
-            bgSecondary: '#111827',
-            bgCard: '#1a2332',
-            border: '#2d3a4f',
-            textPrimary: '#f1f5f9',
-            textSecondary: '#94a3b8',
-            textMuted: '#64748b',
-            accent: '#06b6d4',
-            success: '#10b981',
-            danger: '#ef4444',
-            download: '#3b82f6',
-            upload: '#8b5cf6'
-        };
+            // Theme colors for canvas
+            const colors = {
+                bgPrimary: '#0a0f1a',
+                bgSecondary: '#111827',
+                bgCard: '#1a2332',
+                border: '#2d3a4f',
+                textPrimary: '#f1f5f9',
+                textSecondary: '#94a3b8',
+                textMuted: '#64748b',
+                accent: '#06b6d4',
+                success: '#10b981',
+                danger: '#ef4444',
+                download: '#3b82f6',
+                upload: '#8b5cf6'
+            };
 
-        function init() {
-            loadStoredData();
-            initGraph();
-            startMonitoring();
-            updateDisplay();
-            sessionInterval = setInterval(updateSessionTime, 1000);
-            startAutoSpeedTest();
-        }
+            // Toast Notification System
+            function showToast(message, type = 'success', duration = 3500) {
+                const container = document.getElementById('toastContainer');
+                const toast = document.createElement('div');
+                toast.className = `toast ${type}`;
+                toast.textContent = message;
+                container.appendChild(toast);
 
-        function initGraph() {
-            graphCanvas = document.getElementById('connectionGraph');
-            graphCtx = graphCanvas.getContext('2d');
-
-            const container = graphCanvas.parentElement;
-            graphCanvas.width = container.clientWidth - 40;
-            graphCanvas.height = 260;
-
-            window.addEventListener('resize', () => {
-                graphCanvas.width = container.clientWidth - 40;
-                drawGraph();
-            });
-
-            drawGraph();
-        }
-
-        function switchGraphView(view) {
-            currentGraphView = view;
-
-            document.getElementById('latencyGraphBtn').classList.remove('active');
-            document.getElementById('speedGraphBtn').classList.remove('active');
-
-            if (view === 'latency') {
-                document.getElementById('latencyGraphBtn').classList.add('active');
-            } else {
-                document.getElementById('speedGraphBtn').classList.add('active');
+                setTimeout(() => {
+                    toast.classList.add('removing');
+                    setTimeout(() => {
+                        toast.remove();
+                    }, 300);
+                }, duration);
             }
 
-            const legend = document.getElementById('graphLegend');
-            if (view === 'latency') {
-                legend.innerHTML = `
-                    <div class="legend-item">
-                        <div class="legend-dot online"></div>
-                        <span>Online</span>
-                    </div>
-                    <div class="legend-item">
-                        <div class="legend-dot offline"></div>
-                        <span>Offline</span>
-                    </div>
-                    <div class="legend-item">
-                        <div class="legend-dot latency"></div>
-                        <span>Latency (ms)</span>
-                    </div>
-                `;
-            } else {
-                legend.innerHTML = `
-                    <div class="legend-item">
-                        <div class="legend-dot online"></div>
-                        <span>Online</span>
-                    </div>
-                    <div class="legend-item">
-                        <div class="legend-dot offline"></div>
-                        <span>Offline</span>
-                    </div>
-                    <div class="legend-item">
-                        <div class="legend-dot download"></div>
-                        <span>Download (Mbps)</span>
-                    </div>
-                    <div class="legend-item">
-                        <div class="legend-dot upload"></div>
-                        <span>Upload (Mbps)</span>
-                    </div>
-                `;
+            // Modal Dialog System
+            function showConfirm(title, message, onConfirm) {
+                modalCallback = onConfirm;
+                document.getElementById('modalTitle').textContent = title;
+                document.getElementById('modalContent').textContent = message;
+                document.getElementById('modalOverlay').classList.add('active');
             }
 
-            drawGraph();
-        }
-
-        function drawGraph() {
-            if (!graphCtx || !graphCanvas) return;
-
-            const width = graphCanvas.width;
-            const height = graphCanvas.height;
-            const padding = { top: 20, right: 50, bottom: 35, left: 55 };
-            const graphWidth = width - padding.left - padding.right;
-            const graphHeight = height - padding.top - padding.bottom;
-
-            // Clear and fill background
-            graphCtx.fillStyle = colors.bgSecondary;
-            graphCtx.fillRect(0, 0, width, height);
-
-            const now = Date.now();
-            const thirtyMinsAgo = now - GRAPH_HISTORY_DURATION;
-            const filteredHistory = connectionHistory.filter(point => point.timestamp >= thirtyMinsAgo);
-
-            if (filteredHistory.length === 0) {
-                graphCtx.fillStyle = colors.textMuted;
-                graphCtx.font = '14px Inter, sans-serif';
-                graphCtx.textAlign = 'center';
-                graphCtx.fillText('Collecting data...', width / 2, height / 2);
-                return;
+            function confirmModal() {
+                document.getElementById('modalOverlay').classList.remove('active');
+                if (modalCallback) modalCallback(true);
+                modalCallback = null;
             }
 
-            // Draw grid
-            graphCtx.strokeStyle = colors.border;
-            graphCtx.lineWidth = 1;
-
-            for (let i = 0; i <= 6; i++) {
-                const x = padding.left + (graphWidth / 6) * i;
-                graphCtx.beginPath();
-                graphCtx.moveTo(x, padding.top);
-                graphCtx.lineTo(x, padding.top + graphHeight);
-                graphCtx.stroke();
+            function cancelModal() {
+                document.getElementById('modalOverlay').classList.remove('active');
+                if (modalCallback) modalCallback(false);
+                modalCallback = null;
             }
 
-            for (let i = 0; i <= 4; i++) {
-                const y = padding.top + (graphHeight / 4) * i;
-                graphCtx.beginPath();
-                graphCtx.moveTo(padding.left, y);
-                graphCtx.lineTo(padding.left + graphWidth, y);
-                graphCtx.stroke();
-            }
-
-            // Draw axes
-            graphCtx.strokeStyle = colors.textMuted;
-            graphCtx.lineWidth = 2;
-            graphCtx.beginPath();
-            graphCtx.moveTo(padding.left, padding.top);
-            graphCtx.lineTo(padding.left, padding.top + graphHeight);
-            graphCtx.lineTo(padding.left + graphWidth, padding.top + graphHeight);
-            graphCtx.stroke();
-
-            // Time labels
-            graphCtx.fillStyle = colors.textMuted;
-            graphCtx.font = '11px JetBrains Mono, monospace';
-            graphCtx.textAlign = 'center';
-
-            for (let i = 0; i <= 6; i++) {
-                const x = padding.left + (graphWidth / 6) * i;
-                const timeAgo = 30 - (i * 5);
-                const label = timeAgo === 0 ? 'Now' : `-${timeAgo}m`;
-                graphCtx.fillText(label, x, height - 10);
-            }
-
-            if (currentGraphView === 'latency') {
-                drawLatencyGraph(filteredHistory, padding, graphWidth, graphHeight, width);
-            } else {
-                drawSpeedGraph(filteredHistory, padding, graphWidth, graphHeight, width, thirtyMinsAgo);
-            }
-        }
-
-        function drawLatencyGraph(filteredHistory, padding, graphWidth, graphHeight, width) {
-            // Y-axis label
-            graphCtx.save();
-            graphCtx.fillStyle = colors.textMuted;
-            graphCtx.font = '11px Inter, sans-serif';
-            graphCtx.translate(12, padding.top + graphHeight / 2);
-            graphCtx.rotate(-Math.PI / 2);
-            graphCtx.textAlign = 'center';
-            graphCtx.fillText('Status', 0, 0);
-            graphCtx.restore();
-
-            graphCtx.textAlign = 'left';
-            graphCtx.fillText('Latency', width - padding.right + 5, padding.top - 5);
-
-            const maxLatency = Math.max(...filteredHistory.map(p => p.latency || 0), 100);
-
-            graphCtx.lineWidth = 2;
-            let lastX = null;
-            let lastY = null;
-            let lastStatus = null;
-
-            const thirtyMinsAgo = Date.now() - GRAPH_HISTORY_DURATION;
-
-            filteredHistory.forEach((point) => {
-                const timePct = (point.timestamp - thirtyMinsAgo) / GRAPH_HISTORY_DURATION;
-                const x = padding.left + (graphWidth * timePct);
-                const y = point.status ? padding.top + graphHeight * 0.25 : padding.top + graphHeight * 0.75;
-
-                if (lastX !== null && lastStatus !== null) {
-                    graphCtx.strokeStyle = lastStatus ? colors.success : colors.danger;
-                    graphCtx.beginPath();
-                    graphCtx.moveTo(lastX, lastY);
-                    graphCtx.lineTo(x, lastY);
-                    graphCtx.lineTo(x, y);
-                    graphCtx.stroke();
-
-                    graphCtx.fillStyle = lastStatus ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)';
-                    graphCtx.beginPath();
-                    graphCtx.moveTo(lastX, lastY);
-                    graphCtx.lineTo(x, lastY);
-                    graphCtx.lineTo(x, padding.top + graphHeight);
-                    graphCtx.lineTo(lastX, padding.top + graphHeight);
-                    graphCtx.closePath();
-                    graphCtx.fill();
+            // Request Notification Permission
+            function requestNotificationPermission() {
+                if ('Notification' in window && Notification.permission === 'default') {
+                    Notification.requestPermission().then(permission => {
+                        notificationPermission = permission === 'granted';
+                    });
                 }
-
-                lastX = x;
-                lastY = y;
-                lastStatus = point.status;
-            });
-
-            if (lastX !== null) {
-                const x = padding.left + graphWidth;
-                graphCtx.strokeStyle = lastStatus ? colors.success : colors.danger;
-                graphCtx.beginPath();
-                graphCtx.moveTo(lastX, lastY);
-                graphCtx.lineTo(x, lastY);
-                graphCtx.stroke();
-
-                graphCtx.fillStyle = lastStatus ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)';
-                graphCtx.beginPath();
-                graphCtx.moveTo(lastX, lastY);
-                graphCtx.lineTo(x, lastY);
-                graphCtx.lineTo(x, padding.top + graphHeight);
-                graphCtx.lineTo(lastX, padding.top + graphHeight);
-                graphCtx.closePath();
-                graphCtx.fill();
             }
 
-            // Latency line
-            graphCtx.strokeStyle = colors.download;
-            graphCtx.lineWidth = 2;
-            graphCtx.beginPath();
-
-            let firstPoint = true;
-            filteredHistory.forEach(point => {
-                if (point.latency && point.status) {
-                    const timePct = (point.timestamp - thirtyMinsAgo) / GRAPH_HISTORY_DURATION;
-                    const x = padding.left + (graphWidth * timePct);
-                    const latencyPct = Math.min(point.latency / maxLatency, 1);
-                    const y = padding.top + graphHeight - (graphHeight * latencyPct);
-
-                    if (firstPoint) {
-                        graphCtx.moveTo(x, y);
-                        firstPoint = false;
-                    } else {
-                        graphCtx.lineTo(x, y);
+            // Send Browser Notification
+            function sendNotification(title, options = {}) {
+                if (notificationPermission && 'Notification' in window) {
+                    try {
+                        new Notification(title, options);
+                    } catch (e) {
+                        console.error('Notification failed:', e);
                     }
                 }
-            });
+            }
 
-            graphCtx.stroke();
+            // Update Status Live Region
+            function updateLiveRegion(message) {
+                const region = document.getElementById('statusLiveRegion');
+                region.textContent = message;
+            }
 
-            // Status markers
-            graphCtx.fillStyle = colors.success;
-            graphCtx.beginPath();
-            graphCtx.roundRect(padding.left - 45, padding.top + graphHeight * 0.25 - 4, 35, 8, 2);
-            graphCtx.fill();
+            // LocalStorage Wrapper with Error Handling
+            function getLocalStorage(key, defaultValue = null) {
+                try {
+                    const value = localStorage.getItem(key);
+                    return value ? JSON.parse(value) : defaultValue;
+                } catch (e) {
+                    console.error('localStorage read error:', e);
+                    return defaultValue;
+                }
+            }
 
-            graphCtx.fillStyle = colors.textPrimary;
-            graphCtx.font = '10px JetBrains Mono, monospace';
-            graphCtx.textAlign = 'center';
-            graphCtx.fillText('ON', padding.left - 27, padding.top + graphHeight * 0.25 + 4);
+            function setLocalStorage(key, value) {
+                try {
+                    localStorage.setItem(key, JSON.stringify(value));
+                } catch (e) {
+                    console.error('localStorage write error:', e);
+                }
+            }
 
-            graphCtx.fillStyle = colors.danger;
-            graphCtx.beginPath();
-            graphCtx.roundRect(padding.left - 45, padding.top + graphHeight * 0.75 - 4, 35, 8, 2);
-            graphCtx.fill();
+            function removeLocalStorage(key) {
+                try {
+                    localStorage.removeItem(key);
+                } catch (e) {
+                    console.error('localStorage remove error:', e);
+                }
+            }
 
-            graphCtx.fillStyle = colors.textPrimary;
-            graphCtx.fillText('OFF', padding.left - 27, padding.top + graphHeight * 0.75 + 4);
-        }
+            // Initialize Application
+            function init() {
+                loadStoredData();
+                initGraph();
+                startMonitoring();
+                updateDisplay();
+                sessionInterval = setInterval(updateSessionTime, 1000);
+                startAutoSpeedTest();
+                requestNotificationPermission();
+                setupGraphTooltip();
+                setupThemeToggle();
+            }
 
-        function drawSpeedGraph(filteredHistory, padding, graphWidth, graphHeight, width, thirtyMinsAgo) {
-            graphCtx.textAlign = 'left';
-            graphCtx.fillStyle = colors.textMuted;
-            graphCtx.fillText('Mbps', width - padding.right + 5, padding.top - 5);
+            // Setup Theme Toggle
+            function setupThemeToggle() {
+                const themeToggle = document.getElementById('themeToggle');
+                const htmlElement = document.documentElement;
 
-            const recentSpeedTests = speedTestResults.filter(test => test.timestamp >= thirtyMinsAgo);
-            const maxDownload = Math.max(...recentSpeedTests.map(t => t.download || 0), 10);
-            const maxUpload = Math.max(...recentSpeedTests.map(t => t.upload || 0), 5);
-            const maxSpeed = Math.max(maxDownload, maxUpload, 10);
+                // Check for saved theme preference
+                const savedTheme = getLocalStorage('theme_preference');
+                if (savedTheme) {
+                    htmlElement.style.colorScheme = savedTheme;
+                }
 
-            graphCtx.lineWidth = 2;
-            let lastX = null;
-            let lastY = null;
-            let lastStatus = null;
+                themeToggle.addEventListener('click', () => {
+                    const currentScheme = htmlElement.style.colorScheme || 'dark';
+                    const newScheme = currentScheme === 'dark' ? 'light' : 'dark';
+                    htmlElement.style.colorScheme = newScheme;
+                    setLocalStorage('theme_preference', newScheme);
+                    themeToggle.textContent = newScheme === 'dark' ? '🌙' : '☀️';
+                });
 
-            filteredHistory.forEach((point) => {
-                const timePct = (point.timestamp - thirtyMinsAgo) / GRAPH_HISTORY_DURATION;
-                const x = padding.left + (graphWidth * timePct);
-                const y = point.status ? padding.top + graphHeight * 0.25 : padding.top + graphHeight * 0.75;
+                // Set initial icon
+                const initialScheme = htmlElement.style.colorScheme || 'dark';
+                themeToggle.textContent = initialScheme === 'dark' ? '🌙' : '☀️';
+            }
 
-                if (lastX !== null && lastStatus !== null) {
+            // Initialize Canvas Graph
+            function initGraph() {
+                graphCanvas = document.getElementById('connectionGraph');
+                graphCtx = graphCanvas.getContext('2d');
+
+                const container = graphCanvas.parentElement;
+                const dpr = window.devicePixelRatio || 1;
+                const displayWidth = container.clientWidth - 40;
+                const displayHeight = 260;
+
+                graphCanvas.width = displayWidth * dpr;
+                graphCanvas.height = displayHeight * dpr;
+                graphCanvas.style.width = displayWidth + 'px';
+                graphCanvas.style.height = displayHeight + 'px';
+
+                graphCtx.scale(dpr, dpr);
+
+                window.addEventListener('resize', () => {
+                    const dpr = window.devicePixelRatio || 1;
+                    const displayWidth = container.clientWidth - 40;
+                    const displayHeight = 260;
+
+                    graphCanvas.width = displayWidth * dpr;
+                    graphCanvas.height = displayHeight * dpr;
+                    graphCanvas.style.width = displayWidth + 'px';
+                    graphCanvas.style.height = displayHeight + 'px';
+
+                    graphCtx.scale(dpr, dpr);
+                    drawGraph();
+                });
+
+                drawGraph();
+            }
+
+            // Setup Graph Tooltip
+            function setupGraphTooltip() {
+                graphCanvas.addEventListener('mousemove', handleGraphMouseMove);
+                graphCanvas.addEventListener('mouseleave', hideGraphTooltip);
+            }
+
+            function handleGraphMouseMove(e) {
+                const rect = graphCanvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+
+                const dpr = window.devicePixelRatio || 1;
+                const canvasX = x * dpr;
+                const canvasY = y * dpr;
+
+                const displayWidth = graphCanvas.style.width ? parseInt(graphCanvas.style.width) : graphCanvas.width;
+                const displayHeight = graphCanvas.style.height ? parseInt(graphCanvas.style.height) : graphCanvas.height;
+                const padding = { top: 20, right: 50, bottom: 35, left: 55 };
+
+                if (canvasX < padding.left || canvasX > displayWidth - padding.right ||
+                    canvasY < padding.top || canvasY > displayHeight - padding.bottom) {
+                    hideGraphTooltip();
+                    return;
+                }
+
+                const now = Date.now();
+                const thirtyMinsAgo = now - GRAPH_HISTORY_DURATION;
+                const filteredHistory = connectionHistory.filter(point => point.timestamp >= thirtyMinsAgo);
+
+                if (filteredHistory.length === 0) {
+                    hideGraphTooltip();
+                    return;
+                }
+
+                const graphWidth = displayWidth - padding.left - padding.right;
+                const timePct = (canvasX - padding.left) / graphWidth;
+                const targetTime = thirtyMinsAgo + (timePct * GRAPH_HISTORY_DURATION);
+
+                let closest = filteredHistory[0];
+                let minDiff = Math.abs(closest.timestamp - targetTime);
+
+                for (let point of filteredHistory) {
+                    const diff = Math.abs(point.timestamp - targetTime);
+                    if (diff < minDiff) {
+                        minDiff = diff;
+                        closest = point;
+                    }
+                }
+
+                showGraphTooltip(x, y, closest);
+            }
+
+            function showGraphTooltip(x, y, dataPoint) {
+                const tooltip = document.getElementById('graphTooltip');
+                const date = new Date(dataPoint.timestamp);
+                const timeStr = date.toLocaleTimeString();
+                const statusStr = dataPoint.status ? 'Online' : 'Offline';
+
+                let tooltipContent = `${timeStr}<br/>${statusStr}`;
+                if (dataPoint.latency !== null && dataPoint.status) {
+                    tooltipContent += `<br/>Latency: ${dataPoint.latency}ms`;
+                }
+
+                tooltip.innerHTML = tooltipContent;
+                tooltip.classList.add('active');
+                tooltip.style.left = x + 10 + 'px';
+                tooltip.style.top = y - 50 + 'px';
+            }
+
+            function hideGraphTooltip() {
+                const tooltip = document.getElementById('graphTooltip');
+                tooltip.classList.remove('active');
+            }
+
+            // Switch Graph View
+            function switchGraphView(view) {
+                currentGraphView = view;
+
+                document.getElementById('latencyGraphBtn').classList.remove('active');
+                document.getElementById('speedGraphBtn').classList.remove('active');
+
+                if (view === 'latency') {
+                    document.getElementById('latencyGraphBtn').classList.add('active');
+                } else {
+                    document.getElementById('speedGraphBtn').classList.add('active');
+                }
+
+                const legend = document.getElementById('graphLegend');
+                if (view === 'latency') {
+                    legend.innerHTML = `
+                        <div class="legend-item">
+                            <div class="legend-dot online"></div>
+                            <span>Online</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-dot offline"></div>
+                            <span>Offline</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-dot latency"></div>
+                            <span>Latency (ms)</span>
+                        </div>
+                    `;
+                } else {
+                    legend.innerHTML = `
+                        <div class="legend-item">
+                            <div class="legend-dot online"></div>
+                            <span>Online</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-dot offline"></div>
+                            <span>Offline</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-dot download"></div>
+                            <span>Download (Mbps)</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-dot upload"></div>
+                            <span>Upload (Mbps)</span>
+                        </div>
+                    `;
+                }
+
+                drawGraph();
+            }
+
+            // Draw Graph
+            function drawGraph() {
+                if (!graphCtx || !graphCanvas) return;
+
+                const displayWidth = graphCanvas.style.width ? parseInt(graphCanvas.style.width) : graphCanvas.width;
+                const displayHeight = graphCanvas.style.height ? parseInt(graphCanvas.style.height) : graphCanvas.height;
+                const padding = { top: 20, right: 50, bottom: 35, left: 55 };
+                const graphWidth = displayWidth - padding.left - padding.right;
+                const graphHeight = displayHeight - padding.top - padding.bottom;
+
+                // Clear and fill background
+                graphCtx.fillStyle = colors.bgSecondary;
+                graphCtx.fillRect(0, 0, displayWidth, displayHeight);
+
+                const now = Date.now();
+                const thirtyMinsAgo = now - GRAPH_HISTORY_DURATION;
+                const filteredHistory = connectionHistory.filter(point => point.timestamp >= thirtyMinsAgo);
+
+                if (filteredHistory.length === 0) {
+                    graphCtx.fillStyle = colors.textMuted;
+                    graphCtx.font = '14px Inter, sans-serif';
+                    graphCtx.textAlign = 'center';
+                    graphCtx.fillText('Collecting data...', displayWidth / 2, displayHeight / 2);
+                    return;
+                }
+
+                // Draw grid
+                graphCtx.strokeStyle = colors.border;
+                graphCtx.lineWidth = 1;
+
+                for (let i = 0; i <= 6; i++) {
+                    const x = padding.left + (graphWidth / 6) * i;
+                    graphCtx.beginPath();
+                    graphCtx.moveTo(x, padding.top);
+                    graphCtx.lineTo(x, padding.top + graphHeight);
+                    graphCtx.stroke();
+                }
+
+                for (let i = 0; i <= 4; i++) {
+                    const y = padding.top + (graphHeight / 4) * i;
+                    graphCtx.beginPath();
+                    graphCtx.moveTo(padding.left, y);
+                    graphCtx.lineTo(padding.left + graphWidth, y);
+                    graphCtx.stroke();
+                }
+
+                // Draw axes
+                graphCtx.strokeStyle = colors.textMuted;
+                graphCtx.lineWidth = 2;
+                graphCtx.beginPath();
+                graphCtx.moveTo(padding.left, padding.top);
+                graphCtx.lineTo(padding.left, padding.top + graphHeight);
+                graphCtx.lineTo(padding.left + graphWidth, padding.top + graphHeight);
+                graphCtx.stroke();
+
+                // Time labels
+                graphCtx.fillStyle = colors.textMuted;
+                graphCtx.font = '11px JetBrains Mono, monospace';
+                graphCtx.textAlign = 'center';
+
+                for (let i = 0; i <= 6; i++) {
+                    const x = padding.left + (graphWidth / 6) * i;
+                    const timeAgo = 30 - (i * 5);
+                    const label = timeAgo === 0 ? 'Now' : `-${timeAgo}m`;
+                    graphCtx.fillText(label, x, displayHeight - 10);
+                }
+
+                if (currentGraphView === 'latency') {
+                    drawLatencyGraph(filteredHistory, padding, graphWidth, graphHeight, displayWidth);
+                } else {
+                    drawSpeedGraph(filteredHistory, padding, graphWidth, graphHeight, displayWidth, thirtyMinsAgo);
+                }
+            }
+
+            // Draw Status Bands (Shared Helper)
+            function drawStatusBands(filteredHistory, padding, graphWidth, graphHeight) {
+                graphCtx.lineWidth = 2;
+                let lastX = null;
+                let lastY = null;
+                let lastStatus = null;
+
+                const thirtyMinsAgo = Date.now() - GRAPH_HISTORY_DURATION;
+
+                filteredHistory.forEach((point) => {
+                    const timePct = (point.timestamp - thirtyMinsAgo) / GRAPH_HISTORY_DURATION;
+                    const x = padding.left + (graphWidth * timePct);
+                    const y = point.status ? padding.top + graphHeight * 0.25 : padding.top + graphHeight * 0.75;
+
+                    if (lastX !== null && lastStatus !== null) {
+                        graphCtx.strokeStyle = lastStatus ? colors.success : colors.danger;
+                        graphCtx.beginPath();
+                        graphCtx.moveTo(lastX, lastY);
+                        graphCtx.lineTo(x, lastY);
+                        graphCtx.lineTo(x, y);
+                        graphCtx.stroke();
+
+                        graphCtx.fillStyle = lastStatus ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)';
+                        graphCtx.beginPath();
+                        graphCtx.moveTo(lastX, lastY);
+                        graphCtx.lineTo(x, lastY);
+                        graphCtx.lineTo(x, padding.top + graphHeight);
+                        graphCtx.lineTo(lastX, padding.top + graphHeight);
+                        graphCtx.closePath();
+                        graphCtx.fill();
+                    }
+
+                    lastX = x;
+                    lastY = y;
+                    lastStatus = point.status;
+                });
+
+                if (lastX !== null) {
+                    const x = padding.left + graphWidth;
                     graphCtx.strokeStyle = lastStatus ? colors.success : colors.danger;
                     graphCtx.beginPath();
                     graphCtx.moveTo(lastX, lastY);
                     graphCtx.lineTo(x, lastY);
-                    graphCtx.lineTo(x, y);
                     graphCtx.stroke();
 
                     graphCtx.fillStyle = lastStatus ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)';
@@ -1270,44 +1683,41 @@
                     graphCtx.closePath();
                     graphCtx.fill();
                 }
-
-                lastX = x;
-                lastY = y;
-                lastStatus = point.status;
-            });
-
-            if (lastX !== null) {
-                const x = padding.left + graphWidth;
-                graphCtx.strokeStyle = lastStatus ? colors.success : colors.danger;
-                graphCtx.beginPath();
-                graphCtx.moveTo(lastX, lastY);
-                graphCtx.lineTo(x, lastY);
-                graphCtx.stroke();
-
-                graphCtx.fillStyle = lastStatus ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)';
-                graphCtx.beginPath();
-                graphCtx.moveTo(lastX, lastY);
-                graphCtx.lineTo(x, lastY);
-                graphCtx.lineTo(x, padding.top + graphHeight);
-                graphCtx.lineTo(lastX, padding.top + graphHeight);
-                graphCtx.closePath();
-                graphCtx.fill();
             }
 
-            // Speed lines
-            if (recentSpeedTests.length > 0) {
-                // Download
+            // Draw Latency Graph
+            function drawLatencyGraph(filteredHistory, padding, graphWidth, graphHeight, displayWidth) {
+                // Y-axis label
+                graphCtx.save();
+                graphCtx.fillStyle = colors.textMuted;
+                graphCtx.font = '11px Inter, sans-serif';
+                graphCtx.translate(12, padding.top + graphHeight / 2);
+                graphCtx.rotate(-Math.PI / 2);
+                graphCtx.textAlign = 'center';
+                graphCtx.fillText('Status', 0, 0);
+                graphCtx.restore();
+
+                graphCtx.textAlign = 'left';
+                graphCtx.fillText('Latency', displayWidth - padding.right + 5, padding.top - 5);
+
+                const maxLatency = Math.max(...filteredHistory.map(p => p.latency || 0), 100);
+
+                // Draw status bands
+                drawStatusBands(filteredHistory, padding, graphWidth, graphHeight);
+
+                // Latency line
                 graphCtx.strokeStyle = colors.download;
-                graphCtx.lineWidth = 3;
+                graphCtx.lineWidth = 2;
                 graphCtx.beginPath();
 
                 let firstPoint = true;
-                recentSpeedTests.forEach(test => {
-                    if (test.download) {
-                        const timePct = (test.timestamp - thirtyMinsAgo) / GRAPH_HISTORY_DURATION;
+                const thirtyMinsAgo = Date.now() - GRAPH_HISTORY_DURATION;
+                filteredHistory.forEach(point => {
+                    if (point.latency && point.status) {
+                        const timePct = (point.timestamp - thirtyMinsAgo) / GRAPH_HISTORY_DURATION;
                         const x = padding.left + (graphWidth * timePct);
-                        const speedPct = Math.min(test.download / maxSpeed, 1);
-                        const y = padding.top + graphHeight - (graphHeight * speedPct);
+                        const latencyPct = Math.min(point.latency / maxLatency, 1);
+                        const y = padding.top + graphHeight - (graphHeight * latencyPct);
 
                         if (firstPoint) {
                             graphCtx.moveTo(x, y);
@@ -1317,530 +1727,695 @@
                         }
                     }
                 });
+
                 graphCtx.stroke();
 
-                // Download points
-                recentSpeedTests.forEach(test => {
-                    if (test.download) {
-                        const timePct = (test.timestamp - thirtyMinsAgo) / GRAPH_HISTORY_DURATION;
-                        const x = padding.left + (graphWidth * timePct);
-                        const speedPct = Math.min(test.download / maxSpeed, 1);
-                        const y = padding.top + graphHeight - (graphHeight * speedPct);
-
-                        graphCtx.fillStyle = colors.download;
-                        graphCtx.beginPath();
-                        graphCtx.arc(x, y, 5, 0, Math.PI * 2);
-                        graphCtx.fill();
-                    }
-                });
-
-                // Upload
-                graphCtx.strokeStyle = colors.upload;
-                graphCtx.lineWidth = 3;
+                // Status markers
+                graphCtx.fillStyle = colors.success;
                 graphCtx.beginPath();
+                graphCtx.roundRect(padding.left - 45, padding.top + graphHeight * 0.25 - 4, 35, 8, 2);
+                graphCtx.fill();
 
-                firstPoint = true;
-                recentSpeedTests.forEach(test => {
-                    if (test.upload) {
-                        const timePct = (test.timestamp - thirtyMinsAgo) / GRAPH_HISTORY_DURATION;
-                        const x = padding.left + (graphWidth * timePct);
-                        const speedPct = Math.min(test.upload / maxSpeed, 1);
-                        const y = padding.top + graphHeight - (graphHeight * speedPct);
+                graphCtx.fillStyle = colors.textPrimary;
+                graphCtx.font = '10px JetBrains Mono, monospace';
+                graphCtx.textAlign = 'center';
+                graphCtx.fillText('ON', padding.left - 27, padding.top + graphHeight * 0.25 + 4);
 
-                        if (firstPoint) {
-                            graphCtx.moveTo(x, y);
-                            firstPoint = false;
-                        } else {
-                            graphCtx.lineTo(x, y);
-                        }
-                    }
-                });
-                graphCtx.stroke();
+                graphCtx.fillStyle = colors.danger;
+                graphCtx.beginPath();
+                graphCtx.roundRect(padding.left - 45, padding.top + graphHeight * 0.75 - 4, 35, 8, 2);
+                graphCtx.fill();
 
-                // Upload points
-                recentSpeedTests.forEach(test => {
-                    if (test.upload) {
-                        const timePct = (test.timestamp - thirtyMinsAgo) / GRAPH_HISTORY_DURATION;
-                        const x = padding.left + (graphWidth * timePct);
-                        const speedPct = Math.min(test.upload / maxSpeed, 1);
-                        const y = padding.top + graphHeight - (graphHeight * speedPct);
-
-                        graphCtx.fillStyle = colors.upload;
-                        graphCtx.beginPath();
-                        graphCtx.arc(x, y, 5, 0, Math.PI * 2);
-                        graphCtx.fill();
-                    }
-                });
+                graphCtx.fillStyle = colors.textPrimary;
+                graphCtx.fillText('OFF', padding.left - 27, padding.top + graphHeight * 0.75 + 4);
             }
 
-            // Status markers
-            graphCtx.fillStyle = colors.success;
-            graphCtx.beginPath();
-            graphCtx.roundRect(padding.left - 45, padding.top + graphHeight * 0.25 - 4, 35, 8, 2);
-            graphCtx.fill();
+            // Draw Speed Graph
+            function drawSpeedGraph(filteredHistory, padding, graphWidth, graphHeight, displayWidth, thirtyMinsAgo) {
+                graphCtx.textAlign = 'left';
+                graphCtx.fillStyle = colors.textMuted;
+                graphCtx.fillText('Mbps', displayWidth - padding.right + 5, padding.top - 5);
 
-            graphCtx.fillStyle = colors.textPrimary;
-            graphCtx.font = '10px JetBrains Mono, monospace';
-            graphCtx.textAlign = 'center';
-            graphCtx.fillText('ON', padding.left - 27, padding.top + graphHeight * 0.25 + 4);
+                const recentSpeedTests = speedTestResults.filter(test => test.timestamp >= thirtyMinsAgo);
+                const maxDownload = Math.max(...recentSpeedTests.map(t => t.download || 0), 10);
+                const maxUpload = Math.max(...recentSpeedTests.map(t => t.upload || 0), 5);
+                const maxSpeed = Math.max(maxDownload, maxUpload, 10);
 
-            graphCtx.fillStyle = colors.danger;
-            graphCtx.beginPath();
-            graphCtx.roundRect(padding.left - 45, padding.top + graphHeight * 0.75 - 4, 35, 8, 2);
-            graphCtx.fill();
+                // Draw status bands
+                drawStatusBands(filteredHistory, padding, graphWidth, graphHeight);
 
-            graphCtx.fillStyle = colors.textPrimary;
-            graphCtx.fillText('OFF', padding.left - 27, padding.top + graphHeight * 0.75 + 4);
-        }
+                // Speed lines
+                if (recentSpeedTests.length > 0) {
+                    // Download
+                    graphCtx.strokeStyle = colors.download;
+                    graphCtx.lineWidth = 3;
+                    graphCtx.beginPath();
 
-        function loadStoredData() {
-            const stored = localStorage.getItem('netpulse_data');
-            if (stored) {
-                const data = JSON.parse(stored);
-                events = data.events || [];
-                totalUptime = data.totalUptime || 0;
-                totalDowntime = data.totalDowntime || 0;
-                latencyMeasurements = data.latencyMeasurements || [];
-                connectionHistory = data.connectionHistory || [];
-                speedTestResults = data.speedTestResults || [];
-                currentDownloadSpeed = data.currentDownloadSpeed || null;
-                currentUploadSpeed = data.currentUploadSpeed || null;
-                lastSpeedTestTime = data.lastSpeedTestTime || 0;
+                    let firstPoint = true;
+                    recentSpeedTests.forEach(test => {
+                        if (test.download) {
+                            const timePct = (test.timestamp - thirtyMinsAgo) / GRAPH_HISTORY_DURATION;
+                            const x = padding.left + (graphWidth * timePct);
+                            const speedPct = Math.min(test.download / maxSpeed, 1);
+                            const y = padding.top + graphHeight - (graphHeight * speedPct);
+
+                            if (firstPoint) {
+                                graphCtx.moveTo(x, y);
+                                firstPoint = false;
+                            } else {
+                                graphCtx.lineTo(x, y);
+                            }
+                        }
+                    });
+                    graphCtx.stroke();
+
+                    // Download points
+                    recentSpeedTests.forEach(test => {
+                        if (test.download) {
+                            const timePct = (test.timestamp - thirtyMinsAgo) / GRAPH_HISTORY_DURATION;
+                            const x = padding.left + (graphWidth * timePct);
+                            const speedPct = Math.min(test.download / maxSpeed, 1);
+                            const y = padding.top + graphHeight - (graphHeight * speedPct);
+
+                            graphCtx.fillStyle = colors.download;
+                            graphCtx.beginPath();
+                            graphCtx.arc(x, y, 5, 0, Math.PI * 2);
+                            graphCtx.fill();
+                        }
+                    });
+
+                    // Upload
+                    graphCtx.strokeStyle = colors.upload;
+                    graphCtx.lineWidth = 3;
+                    graphCtx.beginPath();
+
+                    firstPoint = true;
+                    recentSpeedTests.forEach(test => {
+                        if (test.upload) {
+                            const timePct = (test.timestamp - thirtyMinsAgo) / GRAPH_HISTORY_DURATION;
+                            const x = padding.left + (graphWidth * timePct);
+                            const speedPct = Math.min(test.upload / maxSpeed, 1);
+                            const y = padding.top + graphHeight - (graphHeight * speedPct);
+
+                            if (firstPoint) {
+                                graphCtx.moveTo(x, y);
+                                firstPoint = false;
+                            } else {
+                                graphCtx.lineTo(x, y);
+                            }
+                        }
+                    });
+                    graphCtx.stroke();
+
+                    // Upload points
+                    recentSpeedTests.forEach(test => {
+                        if (test.upload) {
+                            const timePct = (test.timestamp - thirtyMinsAgo) / GRAPH_HISTORY_DURATION;
+                            const x = padding.left + (graphWidth * timePct);
+                            const speedPct = Math.min(test.upload / maxSpeed, 1);
+                            const y = padding.top + graphHeight - (graphHeight * speedPct);
+
+                            graphCtx.fillStyle = colors.upload;
+                            graphCtx.beginPath();
+                            graphCtx.arc(x, y, 5, 0, Math.PI * 2);
+                            graphCtx.fill();
+                        }
+                    });
+                }
+
+                // Status markers
+                graphCtx.fillStyle = colors.success;
+                graphCtx.beginPath();
+                graphCtx.roundRect(padding.left - 45, padding.top + graphHeight * 0.25 - 4, 35, 8, 2);
+                graphCtx.fill();
+
+                graphCtx.fillStyle = colors.textPrimary;
+                graphCtx.font = '10px JetBrains Mono, monospace';
+                graphCtx.textAlign = 'center';
+                graphCtx.fillText('ON', padding.left - 27, padding.top + graphHeight * 0.25 + 4);
+
+                graphCtx.fillStyle = colors.danger;
+                graphCtx.beginPath();
+                graphCtx.roundRect(padding.left - 45, padding.top + graphHeight * 0.75 - 4, 35, 8, 2);
+                graphCtx.fill();
+
+                graphCtx.fillStyle = colors.textPrimary;
+                graphCtx.fillText('OFF', padding.left - 27, padding.top + graphHeight * 0.75 + 4);
+            }
+
+            // Load Stored Data
+            function loadStoredData() {
+                const stored = getLocalStorage('netpulse_data');
+                if (stored) {
+                    events = stored.events || [];
+                    totalUptime = stored.totalUptime || 0;
+                    totalDowntime = stored.totalDowntime || 0;
+                    latencyMeasurements = stored.latencyMeasurements || [];
+                    connectionHistory = stored.connectionHistory || [];
+                    speedTestResults = stored.speedTestResults || [];
+                    currentDownloadSpeed = stored.currentDownloadSpeed || null;
+                    currentUploadSpeed = stored.currentUploadSpeed || null;
+                    lastSpeedTestTime = stored.lastSpeedTestTime || 0;
+
+                    // Restore sessionStartTime
+                    const storedSessionStart = getLocalStorage('netpulse_session_start');
+                    if (storedSessionStart) {
+                        sessionStartTime = storedSessionStart;
+                    }
+
+                    const thirtyMinsAgo = Date.now() - GRAPH_HISTORY_DURATION;
+                    connectionHistory = connectionHistory.filter(point => point.timestamp >= thirtyMinsAgo);
+
+                    if (currentDownloadSpeed) {
+                        document.getElementById('downloadSpeed').textContent = currentDownloadSpeed.toFixed(2) + ' Mbps';
+                    }
+                    if (currentUploadSpeed) {
+                        document.getElementById('uploadSpeed').textContent = currentUploadSpeed.toFixed(2) + ' Mbps';
+                    }
+                }
+            }
+
+            // Save Data
+            function saveData() {
+                const data = {
+                    events: events.slice(-100),
+                    totalUptime,
+                    totalDowntime,
+                    latencyMeasurements: latencyMeasurements.slice(-50),
+                    connectionHistory: connectionHistory.slice(-600),
+                    speedTestResults: speedTestResults.slice(-50),
+                    currentDownloadSpeed,
+                    currentUploadSpeed,
+                    lastSpeedTestTime
+                };
+                setLocalStorage('netpulse_data', data);
+                setLocalStorage('netpulse_session_start', sessionStartTime);
+            }
+
+            // Check Connection with Fallback
+            async function checkConnection() {
+                if (!monitoringActive) return;
+
+                const startTime = Date.now();
+                let isOnline = false;
+                let latency = null;
+
+                // Try primary URL
+                try {
+                    await fetch(PING_URLS[0] + '?t=' + Date.now(), {
+                        method: 'HEAD',
+                        mode: 'no-cors',
+                        cache: 'no-cache',
+                        signal: AbortSignal.timeout(PING_TIMEOUT)
+                    });
+
+                    latency = Date.now() - startTime;
+                    isOnline = true;
+                    latencyMeasurements.push(latency);
+                    if (latencyMeasurements.length > 50) latencyMeasurements.shift();
+                } catch {
+                    // Try secondary URL
+                    try {
+                        await fetch(PING_URLS[1] + '?t=' + Date.now(), {
+                            method: 'HEAD',
+                            mode: 'no-cors',
+                            cache: 'no-cache',
+                            signal: AbortSignal.timeout(PING_TIMEOUT)
+                        });
+
+                        latency = Date.now() - startTime;
+                        isOnline = true;
+                        latencyMeasurements.push(latency);
+                        if (latencyMeasurements.length > 50) latencyMeasurements.shift();
+                    } catch {
+                        isOnline = false;
+                    }
+                }
+
+                connectionHistory.push({
+                    timestamp: Date.now(),
+                    status: isOnline,
+                    latency: latency
+                });
 
                 const thirtyMinsAgo = Date.now() - GRAPH_HISTORY_DURATION;
                 connectionHistory = connectionHistory.filter(point => point.timestamp >= thirtyMinsAgo);
 
-                if (currentDownloadSpeed) {
-                    document.getElementById('downloadSpeed').textContent = currentDownloadSpeed.toFixed(2) + ' Mbps';
-                }
-                if (currentUploadSpeed) {
-                    document.getElementById('uploadSpeed').textContent = currentUploadSpeed.toFixed(2) + ' Mbps';
-                }
-            }
-        }
-
-        function saveData() {
-            const data = {
-                events: events.slice(-100),
-                totalUptime,
-                totalDowntime,
-                latencyMeasurements: latencyMeasurements.slice(-50),
-                connectionHistory: connectionHistory.slice(-600),
-                speedTestResults: speedTestResults.slice(-50),
-                currentDownloadSpeed,
-                currentUploadSpeed,
-                lastSpeedTestTime
-            };
-            localStorage.setItem('netpulse_data', JSON.stringify(data));
-        }
-
-        async function checkConnection() {
-            if (!monitoringActive) return;
-
-            const startTime = Date.now();
-            let isOnline = false;
-            let latency = null;
-
-            try {
-                await fetch(PING_URLS[0] + '?t=' + Date.now(), {
-                    method: 'HEAD',
-                    mode: 'no-cors',
-                    cache: 'no-cache',
-                    signal: AbortSignal.timeout(PING_TIMEOUT)
-                });
-
-                latency = Date.now() - startTime;
-                isOnline = true;
-                latencyMeasurements.push(latency);
-                if (latencyMeasurements.length > 50) latencyMeasurements.shift();
-            } catch {
-                isOnline = false;
-            }
-
-            connectionHistory.push({
-                timestamp: Date.now(),
-                status: isOnline,
-                latency: latency
-            });
-
-            const thirtyMinsAgo = Date.now() - GRAPH_HISTORY_DURATION;
-            connectionHistory = connectionHistory.filter(point => point.timestamp >= thirtyMinsAgo);
-
-            if (currentStatus === null) {
-                currentStatus = isOnline;
-                addEvent(isOnline ? 'online' : 'offline');
-            } else if (currentStatus !== isOnline) {
-                if (!isOnline) {
-                    lastOfflineTime = Date.now();
-                    addEvent('offline');
+                if (currentStatus === null) {
+                    currentStatus = isOnline;
+                    addEvent(isOnline ? 'online' : 'offline');
+                } else if (currentStatus !== isOnline) {
+                    if (!isOnline) {
+                        lastOfflineTime = Date.now();
+                        addEvent('offline');
+                        sendNotification('Connection Lost', {
+                            body: 'Your internet connection has been lost',
+                            icon: 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Crect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23ef4444%22/%3E%3C/svg%3E'
+                        });
+                        updateLiveRegion('Connection lost - monitoring');
+                    } else {
+                        const downtime = Date.now() - lastOfflineTime;
+                        totalDowntime += downtime;
+                        addEvent('online', downtime);
+                        lastOfflineTime = null;
+                        sendNotification('Connection Restored', {
+                            body: 'Your internet connection is back',
+                            icon: 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Crect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%2310b981%22/%3E%3C/svg%3E'
+                        });
+                        updateLiveRegion('Connection restored');
+                    }
+                    currentStatus = isOnline;
+                } else if (isOnline) {
+                    totalUptime += CHECK_INTERVAL;
                 } else {
-                    const downtime = Date.now() - lastOfflineTime;
-                    totalDowntime += downtime;
-                    addEvent('online', downtime);
-                    lastOfflineTime = null;
-                }
-                currentStatus = isOnline;
-            } else if (isOnline) {
-                totalUptime += CHECK_INTERVAL;
-            } else {
-                totalDowntime += CHECK_INTERVAL;
-            }
-
-            updateDisplay();
-            drawGraph();
-            saveData();
-        }
-
-        function addEvent(type, duration = null) {
-            events.push({
-                type,
-                timestamp: Date.now(),
-                duration
-            });
-
-            if (events.length > 100) events.shift();
-            renderEvents();
-        }
-
-        function renderEvents() {
-            const eventsList = document.getElementById('eventsList');
-
-            if (events.length === 0) {
-                eventsList.innerHTML = `
-                    <div class="empty-state">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
-                        </svg>
-                        <p>No events recorded yet. Monitoring will begin automatically.</p>
-                    </div>
-                `;
-                return;
-            }
-
-            eventsList.innerHTML = events.slice().reverse().map(event => {
-                const date = new Date(event.timestamp);
-                const timeStr = date.toLocaleTimeString();
-                const icon = event.type === 'online' ?
-                    '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>' :
-                    '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>';
-                const typeText = event.type === 'online' ? 'Connected' : 'Disconnected';
-
-                let durationStr = '';
-                if (event.duration) {
-                    const seconds = Math.floor(event.duration / 1000);
-                    const minutes = Math.floor(seconds / 60);
-                    durationStr = `<div class="event-duration">Downtime: ${minutes}m ${seconds % 60}s</div>`;
+                    totalDowntime += CHECK_INTERVAL;
                 }
 
-                return `
-                    <div class="event-item ${event.type}">
-                        <div class="event-icon">${icon}</div>
-                        <div class="event-details">
-                            <div class="event-type">${typeText}</div>
-                            <div class="event-time">${timeStr}</div>
-                            ${durationStr}
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function updateDisplay() {
-            const statusDot = document.getElementById('statusDot');
-            const statusRing = document.getElementById('statusRing');
-            const statusText = document.getElementById('statusText');
-            const statusSubtext = document.getElementById('statusSubtext');
-
-            if (currentStatus === true) {
-                statusDot.className = 'status-dot online';
-                statusRing.className = 'status-ring online';
-                statusText.className = 'online';
-                statusText.textContent = 'Connected';
-                statusSubtext.textContent = 'Your connection is stable';
-            } else if (currentStatus === false) {
-                statusDot.className = 'status-dot offline';
-                statusRing.className = 'status-ring offline';
-                statusText.className = 'offline';
-                statusText.textContent = 'Disconnected';
-                statusSubtext.textContent = 'Connection lost - monitoring...';
-            }
-
-            const totalTime = totalUptime + totalDowntime;
-            const uptimePercent = totalTime > 0 ? ((totalUptime / totalTime) * 100).toFixed(1) : 100;
-            document.getElementById('uptimePercent').textContent = uptimePercent + '%';
-
-            const dropCount = events.filter(e => e.type === 'offline').length;
-            document.getElementById('dropCount').textContent = dropCount;
-
-            if (latencyMeasurements.length > 0) {
-                const avgLatency = latencyMeasurements.reduce((a, b) => a + b, 0) / latencyMeasurements.length;
-                document.getElementById('avgLatency').textContent = Math.round(avgLatency) + 'ms';
-            }
-        }
-
-        function updateSessionTime() {
-            const elapsed = Date.now() - sessionStartTime;
-            const hours = Math.floor(elapsed / 3600000);
-            const minutes = Math.floor((elapsed % 3600000) / 60000);
-            const seconds = Math.floor((elapsed % 60000) / 1000);
-
-            if (hours > 0) {
-                document.getElementById('sessionTime').textContent = `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-            } else {
-                document.getElementById('sessionTime').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-            }
-        }
-
-        function startMonitoring() {
-            if (checkInterval) clearInterval(checkInterval);
-            checkConnection();
-            checkInterval = setInterval(checkConnection, CHECK_INTERVAL);
-        }
-
-        function toggleMonitoring() {
-            monitoringActive = !monitoringActive;
-            const toggleText = document.getElementById('toggleText');
-            const toggleIcon = document.getElementById('toggleIcon');
-
-            if (monitoringActive) {
-                toggleText.textContent = 'Pause';
-                toggleIcon.innerHTML = '<rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect>';
-                startMonitoring();
-            } else {
-                toggleText.textContent = 'Resume';
-                toggleIcon.innerHTML = '<polygon points="5 3 19 12 5 21 5 3"></polygon>';
-                if (checkInterval) clearInterval(checkInterval);
-            }
-        }
-
-        function exportSnapshot() {
-            const avgDownload = speedTestResults.length > 0
-                ? speedTestResults.reduce((a, b) => a + (b.download || 0), 0) / speedTestResults.length
-                : 0;
-            const avgUpload = speedTestResults.length > 0
-                ? speedTestResults.reduce((a, b) => a + (b.upload || 0), 0) / speedTestResults.length
-                : 0;
-
-            const data = {
-                reportGenerator: 'NetPulse v1.0',
-                exportDate: new Date().toISOString(),
-                sessionStartTime: new Date(sessionStartTime).toISOString(),
-                summary: {
-                    totalUptime: Math.round(totalUptime / 1000) + ' seconds',
-                    totalDowntime: Math.round(totalDowntime / 1000) + ' seconds',
-                    uptimePercentage: ((totalUptime / (totalUptime + totalDowntime)) * 100).toFixed(2) + '%',
-                    connectionDrops: events.filter(e => e.type === 'offline').length,
-                    averageLatency: latencyMeasurements.length > 0
-                        ? Math.round(latencyMeasurements.reduce((a, b) => a + b, 0) / latencyMeasurements.length) + 'ms'
-                        : 'N/A'
-                },
-                speedTest: {
-                    currentDownload: currentDownloadSpeed ? currentDownloadSpeed.toFixed(2) + ' Mbps' : 'N/A',
-                    currentUpload: currentUploadSpeed ? currentUploadSpeed.toFixed(2) + ' Mbps' : 'N/A',
-                    averageDownload: avgDownload > 0 ? avgDownload.toFixed(2) + ' Mbps' : 'N/A',
-                    averageUpload: avgUpload > 0 ? avgUpload.toFixed(2) + ' Mbps' : 'N/A',
-                    totalTests: speedTestResults.length
-                },
-                events: events.map(e => ({
-                    type: e.type,
-                    timestamp: new Date(e.timestamp).toISOString(),
-                    duration: e.duration ? Math.round(e.duration / 1000) + ' seconds' : null
-                })),
-                connectionHistory: connectionHistory.map(point => ({
-                    timestamp: new Date(point.timestamp).toISOString(),
-                    status: point.status ? 'online' : 'offline',
-                    latency: point.latency ? point.latency + 'ms' : null
-                })),
-                speedTestHistory: speedTestResults.map(test => ({
-                    timestamp: new Date(test.timestamp).toISOString(),
-                    download: test.download ? test.download.toFixed(2) + ' Mbps' : 'N/A',
-                    upload: test.upload ? test.upload.toFixed(2) + ' Mbps' : 'N/A'
-                }))
-            };
-
-            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `netpulse-report-${Date.now()}.json`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-
-            alert('Report exported successfully! Share this file with your ISP for documentation.');
-        }
-
-        function clearData() {
-            if (confirm('Clear all monitoring data? This action cannot be undone.')) {
-                events = [];
-                totalUptime = 0;
-                totalDowntime = 0;
-                latencyMeasurements = [];
-                connectionHistory = [];
-                speedTestResults = [];
-                currentDownloadSpeed = null;
-                currentUploadSpeed = null;
-                currentStatus = null;
-                sessionStartTime = Date.now();
-                lastSpeedTestTime = 0;
-                localStorage.removeItem('netpulse_data');
-                renderEvents();
                 updateDisplay();
                 drawGraph();
-                document.getElementById('downloadSpeed').textContent = '--';
-                document.getElementById('uploadSpeed').textContent = '--';
-                alert('All data cleared successfully.');
-            }
-        }
-
-        async function runSpeedTest() {
-            if (isSpeedTesting) return;
-            if (!currentStatus) {
-                alert('Cannot test speed while offline.');
-                return;
+                saveData();
             }
 
-            isSpeedTesting = true;
-            const downloadSpeedBox = document.getElementById('downloadSpeedBox');
-            const uploadSpeedBox = document.getElementById('uploadSpeedBox');
-            const downloadValue = document.getElementById('downloadSpeed');
-            const uploadValue = document.getElementById('uploadSpeed');
-            const testBtn = document.getElementById('manualSpeedTestBtn');
-
-            downloadSpeedBox.classList.add('testing');
-            uploadSpeedBox.classList.add('testing');
-            downloadValue.textContent = 'Testing...';
-            uploadValue.textContent = 'Waiting...';
-            if (testBtn) testBtn.disabled = true;
-
-            try {
-                let totalBytes = 0;
-                let totalTime = 0;
-                const downloadIterations = 3;
-
-                for (let i = 0; i < downloadIterations; i++) {
-                    const startTime = performance.now();
-                    const response = await fetch(SPEED_TEST_URL + '?t=' + Date.now(), { cache: 'no-cache' });
-                    const blob = await response.blob();
-                    const endTime = performance.now();
-
-                    totalBytes += blob.size;
-                    totalTime += (endTime - startTime);
-                }
-
-                const avgTimeInSeconds = (totalTime / downloadIterations) / 1000;
-                const avgBytesPerSecond = (totalBytes / downloadIterations) / avgTimeInSeconds;
-                const downloadSpeed = (avgBytesPerSecond * 8) / (1024 * 1024);
-
-                currentDownloadSpeed = downloadSpeed;
-                downloadValue.textContent = downloadSpeed.toFixed(2) + ' Mbps';
-
-                uploadValue.textContent = 'Testing...';
-
-                let uploadSpeed = 0;
-                const uploadIterations = 2;
-                let uploadTotalTime = 0;
-                const uploadDataSize = 512 * 1024;
-                const uploadData = new Blob([new ArrayBuffer(uploadDataSize)]);
-
-                for (let i = 0; i < uploadIterations; i++) {
-                    const startTime = performance.now();
-                    try {
-                        const formData = new FormData();
-                        formData.append('data', uploadData);
-
-                        await fetch('https://httpbin.org/post', {
-                            method: 'POST',
-                            body: formData,
-                            mode: 'no-cors'
-                        }).catch(() => {});
-
-                        const endTime = performance.now();
-                        uploadTotalTime += (endTime - startTime);
-                    } catch {
-                        uploadSpeed = downloadSpeed * 0.3;
-                        break;
-                    }
-                }
-
-                if (uploadTotalTime > 0) {
-                    const avgUploadTime = (uploadTotalTime / uploadIterations) / 1000;
-                    const uploadBytesPerSecond = uploadDataSize / avgUploadTime;
-                    uploadSpeed = (uploadBytesPerSecond * 8) / (1024 * 1024);
-                    uploadSpeed = Math.min(uploadSpeed, downloadSpeed);
-                    uploadSpeed = Math.max(uploadSpeed, downloadSpeed * 0.1);
-                }
-
-                currentUploadSpeed = uploadSpeed;
-                lastSpeedTestTime = Date.now();
-
-                speedTestResults.push({
+            // Add Event
+            function addEvent(type, duration = null) {
+                events.push({
+                    type,
                     timestamp: Date.now(),
-                    download: downloadSpeed,
-                    upload: uploadSpeed
+                    duration
                 });
 
-                if (speedTestResults.length > 50) {
-                    speedTestResults.shift();
-                }
-
-                uploadValue.textContent = uploadSpeed.toFixed(2) + ' Mbps';
-
-                if (currentGraphView === 'speed') {
-                    drawGraph();
-                }
-
-                saveData();
-
-            } catch (error) {
-                console.error('Speed test failed:', error);
-                downloadValue.textContent = 'Failed';
-                uploadValue.textContent = 'Failed';
-
-                setTimeout(() => {
-                    downloadValue.textContent = currentDownloadSpeed ? currentDownloadSpeed.toFixed(2) + ' Mbps' : '--';
-                    uploadValue.textContent = currentUploadSpeed ? currentUploadSpeed.toFixed(2) + ' Mbps' : '--';
-                }, 2000);
-            } finally {
-                isSpeedTesting = false;
-                downloadSpeedBox.classList.remove('testing');
-                uploadSpeedBox.classList.remove('testing');
-                if (testBtn) testBtn.disabled = false;
+                if (events.length > 100) events.shift();
+                renderEvents();
             }
-        }
 
-        function startAutoSpeedTest() {
-            if (speedTestTimer) clearInterval(speedTestTimer);
+            // Render Events
+            function renderEvents() {
+                const eventsList = document.getElementById('eventsList');
 
-            const timeSinceLastTest = Date.now() - lastSpeedTestTime;
-            if (timeSinceLastTest > speedTestInterval * 60 * 1000) {
-                setTimeout(() => {
+                if (events.length === 0) {
+                    eventsList.innerHTML = `
+                        <div class="empty-state">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+                            </svg>
+                            <p>No events recorded yet. Monitoring will begin automatically.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                eventsList.innerHTML = events.slice().reverse().map(event => {
+                    const date = new Date(event.timestamp);
+                    const timeStr = date.toLocaleTimeString();
+                    const icon = event.type === 'online' ?
+                        '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>' :
+                        '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>';
+                    const typeText = event.type === 'online' ? 'Connected' : 'Disconnected';
+
+                    let durationStr = '';
+                    if (event.duration) {
+                        const seconds = Math.floor(event.duration / 1000);
+                        const minutes = Math.floor(seconds / 60);
+                        durationStr = `<div class="event-duration">Downtime: ${minutes}m ${seconds % 60}s</div>`;
+                    }
+
+                    return `
+                        <div class="event-item ${event.type}">
+                            <div class="event-icon">${icon}</div>
+                            <div class="event-details">
+                                <div class="event-type">${typeText}</div>
+                                <div class="event-time">${timeStr}</div>
+                                ${durationStr}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            // Update Display
+            function updateDisplay() {
+                const statusDot = document.getElementById('statusDot');
+                const statusRing = document.getElementById('statusRing');
+                const statusText = document.getElementById('statusText');
+                const statusSubtext = document.getElementById('statusSubtext');
+
+                if (currentStatus === true) {
+                    statusDot.className = 'status-dot online';
+                    statusRing.className = 'status-ring online';
+                    statusText.className = 'online';
+                    statusText.textContent = 'Connected';
+                    statusSubtext.textContent = 'Your connection is stable';
+                } else if (currentStatus === false) {
+                    statusDot.className = 'status-dot offline';
+                    statusRing.className = 'status-ring offline';
+                    statusText.className = 'offline';
+                    statusText.textContent = 'Disconnected';
+                    statusSubtext.textContent = 'Connection lost - monitoring...';
+                }
+
+                const totalTime = totalUptime + totalDowntime;
+                const uptimePercent = totalTime > 0 ? ((totalUptime / totalTime) * 100).toFixed(1) : 100;
+                document.getElementById('uptimePercent').textContent = uptimePercent + '%';
+
+                const dropCount = events.filter(e => e.type === 'offline').length;
+                document.getElementById('dropCount').textContent = dropCount;
+
+                if (latencyMeasurements.length > 0) {
+                    const avgLatency = latencyMeasurements.reduce((a, b) => a + b, 0) / latencyMeasurements.length;
+                    const minLatency = Math.min(...latencyMeasurements);
+                    const maxLatency = Math.max(...latencyMeasurements);
+
+                    document.getElementById('avgLatency').textContent = Math.round(avgLatency) + 'ms';
+                    document.getElementById('minLatency').textContent = Math.round(minLatency) + 'ms';
+
+                    // Calculate jitter (standard deviation)
+                    const variance = latencyMeasurements.reduce((sum, val) => sum + Math.pow(val - avgLatency, 2), 0) / latencyMeasurements.length;
+                    const jitter = Math.sqrt(variance);
+                    document.getElementById('maxJitter').textContent = Math.round(maxLatency) + '/' + Math.round(jitter);
+                }
+            }
+
+            // Update Session Time
+            function updateSessionTime() {
+                const elapsed = Date.now() - sessionStartTime;
+                const hours = Math.floor(elapsed / 3600000);
+                const minutes = Math.floor((elapsed % 3600000) / 60000);
+                const seconds = Math.floor((elapsed % 60000) / 1000);
+
+                if (hours > 0) {
+                    document.getElementById('sessionTime').textContent = `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                } else {
+                    document.getElementById('sessionTime').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                }
+            }
+
+            // Start Monitoring
+            function startMonitoring() {
+                if (checkInterval) clearInterval(checkInterval);
+                checkConnection();
+                checkInterval = setInterval(checkConnection, CHECK_INTERVAL);
+            }
+
+            // Toggle Monitoring
+            function toggleMonitoring() {
+                monitoringActive = !monitoringActive;
+                const toggleText = document.getElementById('toggleText');
+                const toggleIcon = document.getElementById('toggleIcon');
+
+                if (monitoringActive) {
+                    toggleText.textContent = 'Pause';
+                    toggleIcon.innerHTML = '<rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect>';
+                    startMonitoring();
+                    showToast('Monitoring resumed', 'success');
+                    updateLiveRegion('Monitoring resumed');
+                } else {
+                    toggleText.textContent = 'Resume';
+                    toggleIcon.innerHTML = '<polygon points="5 3 19 12 5 21 5 3"></polygon>';
+                    if (checkInterval) clearInterval(checkInterval);
+                    showToast('Monitoring paused', 'success');
+                    updateLiveRegion('Monitoring paused');
+                }
+            }
+
+            // Estimate Upload Speed
+            function estimateUploadSpeed() {
+                let estimate = 0;
+                if (currentDownloadSpeed && currentDownloadSpeed > 0) {
+                    estimate = currentDownloadSpeed * 0.3;
+                } else if ('connection' in navigator) {
+                    const conn = navigator.connection;
+                    if (conn.effectiveType === '4g') estimate = 20;
+                    else if (conn.effectiveType === '3g') estimate = 5;
+                    else if (conn.effectiveType === '2g') estimate = 0.5;
+                }
+                return Math.max(estimate, 0);
+            }
+
+            // Run Speed Test
+            async function runSpeedTest() {
+                if (isSpeedTesting) return;
+                if (!currentStatus) {
+                    showToast('Cannot test speed while offline', 'error');
+                    updateLiveRegion('Speed test unavailable: connection offline');
+                    return;
+                }
+
+                isSpeedTesting = true;
+                const downloadSpeedBox = document.getElementById('downloadSpeedBox');
+                const uploadSpeedBox = document.getElementById('uploadSpeedBox');
+                const downloadValue = document.getElementById('downloadSpeed');
+                const uploadValue = document.getElementById('uploadSpeed');
+                const testBtn = document.getElementById('manualSpeedTestBtn');
+
+                downloadSpeedBox.classList.add('testing');
+                uploadSpeedBox.classList.add('testing');
+                downloadValue.textContent = 'Testing...';
+                uploadValue.textContent = 'Waiting...';
+                if (testBtn) testBtn.disabled = true;
+
+                try {
+                    let totalBytes = 0;
+                    let totalTime = 0;
+                    const downloadIterations = 5;
+
+                    for (let i = 0; i < downloadIterations; i++) {
+                        const startTime = performance.now();
+                        const response = await fetch(SPEED_TEST_URL + '?t=' + Date.now(), { cache: 'no-cache' });
+                        const blob = await response.blob();
+                        const endTime = performance.now();
+
+                        totalBytes += blob.size;
+                        totalTime += (endTime - startTime);
+                    }
+
+                    const avgTimeInSeconds = (totalTime / downloadIterations) / 1000;
+                    const avgBytesPerSecond = (totalBytes / downloadIterations) / avgTimeInSeconds;
+                    const downloadSpeed = (avgBytesPerSecond * 8) / (1024 * 1024);
+
+                    currentDownloadSpeed = downloadSpeed;
+                    downloadValue.textContent = downloadSpeed.toFixed(2) + ' Mbps';
+
+                    // Estimate upload speed
+                    const uploadSpeed = estimateUploadSpeed();
+                    currentUploadSpeed = uploadSpeed;
+                    uploadValue.textContent = uploadSpeed.toFixed(2) + ' Mbps (Est.)';
+
+                    lastSpeedTestTime = Date.now();
+
+                    speedTestResults.push({
+                        timestamp: Date.now(),
+                        download: downloadSpeed,
+                        upload: uploadSpeed
+                    });
+
+                    if (speedTestResults.length > 50) {
+                        speedTestResults.shift();
+                    }
+
+                    if (currentGraphView === 'speed') {
+                        drawGraph();
+                    }
+
+                    saveData();
+                    showToast('Speed test completed', 'success');
+                    updateLiveRegion(`Speed test completed: ${downloadSpeed.toFixed(2)} Mbps download`);
+
+                } catch (error) {
+                    console.error('Speed test failed:', error);
+                    downloadValue.textContent = 'Failed';
+                    uploadValue.textContent = 'Failed';
+                    showToast('Speed test failed', 'error');
+                    updateLiveRegion('Speed test failed');
+
+                    setTimeout(() => {
+                        downloadValue.textContent = currentDownloadSpeed ? currentDownloadSpeed.toFixed(2) + ' Mbps' : '--';
+                        uploadValue.textContent = currentUploadSpeed ? currentUploadSpeed.toFixed(2) + ' Mbps (Est.)' : '--';
+                    }, 2000);
+                } finally {
+                    isSpeedTesting = false;
+                    downloadSpeedBox.classList.remove('testing');
+                    uploadSpeedBox.classList.remove('testing');
+                    if (testBtn) testBtn.disabled = false;
+                }
+            }
+
+            // Export Snapshot (JSON)
+            function exportSnapshot() {
+                const totalTime = totalUptime + totalDowntime;
+                const uptimePercent = totalTime > 0 ? (totalUptime / totalTime) * 100 : 100;
+
+                const avgDownload = speedTestResults.length > 0
+                    ? speedTestResults.reduce((a, b) => a + (b.download || 0), 0) / speedTestResults.length
+                    : 0;
+                const avgUpload = speedTestResults.length > 0
+                    ? speedTestResults.reduce((a, b) => a + (b.upload || 0), 0) / speedTestResults.length
+                    : 0;
+
+                const data = {
+                    reportGenerator: 'NetPulse v2.0',
+                    exportDate: new Date().toISOString(),
+                    sessionStartTime: new Date(sessionStartTime).toISOString(),
+                    summary: {
+                        totalUptime: Math.round(totalUptime / 1000) + ' seconds',
+                        totalDowntime: Math.round(totalDowntime / 1000) + ' seconds',
+                        uptimePercentage: uptimePercent.toFixed(2) + '%',
+                        connectionDrops: events.filter(e => e.type === 'offline').length,
+                        averageLatency: latencyMeasurements.length > 0
+                            ? Math.round(latencyMeasurements.reduce((a, b) => a + b, 0) / latencyMeasurements.length) + 'ms'
+                            : 'N/A'
+                    },
+                    speedTest: {
+                        currentDownload: currentDownloadSpeed ? currentDownloadSpeed.toFixed(2) + ' Mbps' : 'N/A',
+                        currentUpload: currentUploadSpeed ? currentUploadSpeed.toFixed(2) + ' Mbps (Est.)' : 'N/A',
+                        averageDownload: avgDownload > 0 ? avgDownload.toFixed(2) + ' Mbps' : 'N/A',
+                        averageUpload: avgUpload > 0 ? avgUpload.toFixed(2) + ' Mbps' : 'N/A',
+                        totalTests: speedTestResults.length
+                    },
+                    events: events.map(e => ({
+                        type: e.type,
+                        timestamp: new Date(e.timestamp).toISOString(),
+                        duration: e.duration ? Math.round(e.duration / 1000) + ' seconds' : null
+                    })),
+                    connectionHistory: connectionHistory.map(point => ({
+                        timestamp: new Date(point.timestamp).toISOString(),
+                        status: point.status ? 'online' : 'offline',
+                        latency: point.latency ? point.latency + 'ms' : null
+                    })),
+                    speedTestHistory: speedTestResults.map(test => ({
+                        timestamp: new Date(test.timestamp).toISOString(),
+                        download: test.download ? test.download.toFixed(2) + ' Mbps' : 'N/A',
+                        upload: test.upload ? test.upload.toFixed(2) + ' Mbps' : 'N/A'
+                    }))
+                };
+
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `netpulse-report-${Date.now()}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+                showToast('Report exported successfully!', 'success');
+                updateLiveRegion('Report exported as JSON');
+            }
+
+            // Export CSV
+            function exportCSV() {
+                let csv = 'Timestamp,Type,Status,Latency (ms),Download (Mbps),Upload (Mbps)\n';
+
+                const thirtyMinsAgo = Date.now() - GRAPH_HISTORY_DURATION;
+                const recentHistory = connectionHistory.filter(p => p.timestamp >= thirtyMinsAgo);
+
+                recentHistory.forEach(point => {
+                    const date = new Date(point.timestamp).toISOString();
+                    const status = point.status ? 'Online' : 'Offline';
+                    const latency = point.latency || '';
+
+                    const speedTest = speedTestResults.find(s => Math.abs(s.timestamp - point.timestamp) < 1000);
+                    const download = speedTest ? speedTest.download.toFixed(2) : '';
+                    const upload = speedTest ? speedTest.upload.toFixed(2) : '';
+
+                    csv += `"${date}","Connection","${status}","${latency}","${download}","${upload}"\n`;
+                });
+
+                events.forEach(event => {
+                    const date = new Date(event.timestamp).toISOString();
+                    csv += `"${date}","Event","${event.type.toUpperCase()}","","",""\n`;
+                });
+
+                const blob = new Blob([csv], { type: 'text/csv' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `netpulse-data-${Date.now()}.csv`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+                showToast('CSV exported successfully!', 'success');
+                updateLiveRegion('Data exported as CSV');
+            }
+
+            // Clear Data
+            function clearData() {
+                showConfirm('Clear All Data?', 'This action cannot be undone. All monitoring data will be permanently deleted.', (confirmed) => {
+                    if (confirmed) {
+                        events = [];
+                        totalUptime = 0;
+                        totalDowntime = 0;
+                        latencyMeasurements = [];
+                        connectionHistory = [];
+                        speedTestResults = [];
+                        currentDownloadSpeed = null;
+                        currentUploadSpeed = null;
+                        currentStatus = null;
+                        sessionStartTime = Date.now();
+                        lastSpeedTestTime = 0;
+                        removeLocalStorage('netpulse_data');
+                        removeLocalStorage('netpulse_session_start');
+                        renderEvents();
+                        updateDisplay();
+                        drawGraph();
+                        document.getElementById('downloadSpeed').textContent = '--';
+                        document.getElementById('uploadSpeed').textContent = '--';
+                        showToast('All data cleared successfully', 'success');
+                        updateLiveRegion('Monitoring data cleared');
+                    }
+                });
+            }
+
+            // Start Auto Speed Test
+            function startAutoSpeedTest() {
+                if (speedTestTimer) clearInterval(speedTestTimer);
+
+                const timeSinceLastTest = Date.now() - lastSpeedTestTime;
+                if (timeSinceLastTest > speedTestInterval * 60 * 1000) {
+                    setTimeout(() => {
+                        if (currentStatus && !isSpeedTesting) {
+                            runSpeedTest();
+                        }
+                    }, 5000);
+                }
+
+                speedTestTimer = setInterval(() => {
                     if (currentStatus && !isSpeedTesting) {
                         runSpeedTest();
                     }
-                }, 5000);
+                }, speedTestInterval * 60 * 1000);
             }
 
-            speedTestTimer = setInterval(() => {
-                if (currentStatus && !isSpeedTesting) {
-                    runSpeedTest();
+            // Stop Auto Speed Test
+            function stopAutoSpeedTest() {
+                if (speedTestTimer) {
+                    clearInterval(speedTestTimer);
+                    speedTestTimer = null;
                 }
-            }, speedTestInterval * 60 * 1000);
-        }
-
-        function stopAutoSpeedTest() {
-            if (speedTestTimer) {
-                clearInterval(speedTestTimer);
-                speedTestTimer = null;
             }
-        }
 
-        window.addEventListener('load', init);
-        window.addEventListener('beforeunload', () => {
-            saveData();
-            stopAutoSpeedTest();
-        });
+            // Expose public API
+            window.netpulse = {
+                init,
+                switchGraphView,
+                runSpeedTest,
+                toggleMonitoring,
+                exportSnapshot,
+                exportCSV,
+                clearData,
+                confirmModal,
+                cancelModal
+            };
+
+            // Initialize on load
+            window.addEventListener('load', init);
+            window.addEventListener('beforeunload', () => {
+                saveData();
+                stopAutoSpeedTest();
+            });
+        })();
     </script>
 </body>
 </html>
